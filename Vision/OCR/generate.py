@@ -55,20 +55,22 @@ def find_all_wording(dir):
     return result
 
 
-for root, dirs, _ in os.walk('ArknightsGameData'):
-    for client in dirs:
-        wording = find_all_wording(os.path.join(
-            root, client, 'gamedata', 'excel'))
-        if not wording:
-            continue
-        wording.update(set([chr(x) for x in range(33, 127)]))
-        output_dir = os.path.join('output', client)
-        os.makedirs(output_dir, exist_ok=True)
-        context = '\n'.join(wording)
-        with open(os.path.join(output_dir, 'wording.txt'), 'w', encoding='utf-8') as f:
-            f.write(context)
-        keys = set()
-        for k in context:
-            keys.add(k)
-        with open(os.path.join(output_dir, 'keys.txt'), 'w', encoding='utf-8') as f:
-            f.write('\n'.join(keys))
+# for root, dirs, _ in os.walk('ArknightsGameData'):
+#     for client in dirs:
+
+client = 'zh_CN'
+wording = find_all_wording(os.path.join(
+    'ArknightsGameData', client, 'gamedata', 'excel'))
+wording.update(set([chr(x) for x in range(33, 127)]))
+output_dir = os.path.join('output', client)
+os.makedirs(output_dir, exist_ok=True)
+context = '\n'.join(wording)
+with open(os.path.join(output_dir, 'wording.txt'), 'w', encoding='utf-8') as f:
+    f.write(context)
+with open('raw_keys.txt', 'r', encoding='utf-8') as f:
+    raw_keys = f.read()
+keys = set([k for k in raw_keys if ord(k) > 32])
+for k in context:
+    keys.add(k)
+with open(os.path.join(output_dir, 'keys.txt'), 'w', encoding='utf-8') as f:
+    f.write('\n'.join(keys))
