@@ -67,10 +67,15 @@ os.makedirs(output_dir, exist_ok=True)
 context = '\n'.join(wording)
 with open(os.path.join(output_dir, 'wording.txt'), 'w', encoding='utf-8') as f:
     f.write(context)
-with open('raw_keys.txt', 'r', encoding='utf-8') as f:
-    raw_keys = f.read()
-keys = set([k for k in raw_keys if ord(k) > 32])
+keys = set()
 for k in context:
+    if k == '\n' or k == ' ':
+        continue
     keys.add(k)
+with open('raw_keys.txt', 'r', encoding='utf-8') as f:
+    key_text = f.read()
+for k in keys:
+    if k not in key_text:
+        key_text += k + "\n"
 with open(os.path.join(output_dir, 'keys.txt'), 'w', encoding='utf-8') as f:
-    f.write('\n'.join(keys))
+    f.write(key_text)
