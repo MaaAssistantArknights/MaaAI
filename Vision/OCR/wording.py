@@ -2,10 +2,6 @@ import re
 import os
 
 
-print('Please clone these third-party repositories manually into your local directory\n'
-      '- https://github.com/Kengxxiao/ArknightsGameData')
-
-
 def parse_line(line):
     result = set()
     in_string = False
@@ -64,15 +60,11 @@ wording = find_all_wording(os.path.join(
 wording.update(set([chr(x) for x in range(33, 127)]))
 output_dir = os.path.join('output', client)
 os.makedirs(output_dir, exist_ok=True)
+
 all_context = '\n'.join(wording)
 with open(os.path.join(output_dir, 'wording.txt'), 'w', encoding='utf-8') as f:
     f.write(all_context)
-short_context = '\n'.join([w for w in wording if len(w) < 7])
-with open(os.path.join(output_dir, 'short_wording.txt'), 'w', encoding='utf-8') as f:
-    f.write(short_context)
-long_context = '\n'.join([w for w in wording if len(w) >= 7])
-with open(os.path.join(output_dir, 'long_wording.txt'), 'w', encoding='utf-8') as f:
-    f.write(long_context)
+
 keys = set()
 for k in all_context:
     if k == '\n' or k == ' ':
@@ -85,3 +77,15 @@ for k in keys:
         key_text += k + "\n"
 with open(os.path.join(output_dir, 'keys.txt'), 'w', encoding='utf-8') as f:
     f.write(key_text)
+
+short_context = '\n'.join([w for w in wording if len(w) < 7])
+short_output_dir = os.path.join(output_dir, 'short')
+os.makedirs(short_output_dir, exist_ok=True)
+with open(os.path.join(short_output_dir, 'short_wording.txt'), 'w', encoding='utf-8') as f:
+    f.write(short_context)
+
+long_context = '\n'.join([w for w in wording if len(w) >= 7])
+long_output_dir = os.path.join(output_dir, 'long')
+os.makedirs(long_output_dir, exist_ok=True)
+with open(os.path.join(long_output_dir, 'long_wording.txt'), 'w', encoding='utf-8') as f:
+    f.write(long_context)
