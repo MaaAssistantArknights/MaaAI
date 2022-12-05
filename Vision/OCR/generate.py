@@ -2,7 +2,7 @@ import re
 import os
 
 
-print('Please clone these third-party repositories manually into your local directory'
+print('Please clone these third-party repositories manually into your local directory\n'
       '- https://github.com/Kengxxiao/ArknightsGameData')
 
 
@@ -22,12 +22,17 @@ def parse_line(line):
                 string_end = index
                 if has_non_ascii:
                     wording = line[string_start:string_end]
+                    # 小火龙档案里有段乱码，屏蔽掉
+                    if r'■■■■■■■■■■■■■■■■■■\n■■■■■■■■■■\n■■■■■\n\n' in wording:
+                        break
                     wording = re.sub(r"<.*?>", "", wording)
                     wording = re.sub(r"{.*?}", "", wording)
                     wording = wording.replace("\\\\", "\\")
+                    wording = wording.replace("\\\"", "\"")
                     wording = wording.replace("\\n", "\n")
                     wording = wording.replace("\\t", "\n")
                     wording = wording.replace("\t", "\n")
+                    wording = wording.replace(" ", "")
                     result.update(
                         set([w for w in wording.split("\n") if w and w != ' ']))
             in_string = not in_string
