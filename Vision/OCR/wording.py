@@ -67,7 +67,7 @@ with open(os.path.join(output_dir, 'wording.txt'), 'w', encoding='utf-8') as f:
 
 keys = set()
 for k in all_context:
-    if k == '\n' or k == ' ':
+    if ord(k) <= 32:
         continue
     keys.add(k)
 with open('raw_keys.txt', 'r', encoding='utf-8') as f:
