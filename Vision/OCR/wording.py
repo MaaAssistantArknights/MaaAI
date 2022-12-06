@@ -70,7 +70,7 @@ for k in all_context:
     if ord(k) <= 32:
         continue
     keys.add(k)
-with open('raw_keys.txt', 'r', encoding='utf-8') as f:
+with open('raw_keys/cn.txt', 'r', encoding='utf-8') as f:
     key_text = f.read()
 for k in keys:
     if k not in key_text:
