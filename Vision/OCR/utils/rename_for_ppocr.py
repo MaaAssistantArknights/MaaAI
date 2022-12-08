@@ -95,8 +95,8 @@ input_dir = sys.argv[1]
 output_dir = sys.argv[2]
 region = sys.argv[3]
 
-output_train_file = os.path.join(output_dir, '/rec_gt_train.txt')
-output_test_file = os.path.join(output_dir, '/rec_gt_test.txt')
+output_train_file = os.path.join(output_dir, 'rec_gt_train.txt')
+output_test_file = os.path.join(output_dir, 'rec_gt_test.txt')
 
 if os.path.exists(os.path.join('./my_data', region, 'train')):
     as_line(os.path.join('./my_data', region, 'train'), output_train_file)
