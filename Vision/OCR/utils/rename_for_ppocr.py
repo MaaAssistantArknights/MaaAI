@@ -1,4 +1,5 @@
 import os
+import sys
 from collections import defaultdict
 
 keys = set()
@@ -8,10 +9,10 @@ def as_line(input_dir, output_file):
     txt_context = ''
     for path, _, file_list in os.walk(input_dir):
         for file_name in file_list:
-            if not file_name.endswith('.png'):
+            if not (file_name.endswith('.png') or file_name.endswith('.jpg') or file_name.endswith('.bmp')):
                 continue
             full_path = os.path.join(path, file_name)
-            stem = file_name[:-len('.png')]
+            stem = file_name[:-4]
             txt_context += full_path + '\t' + stem + '\n'
 
             for k in stem:
@@ -90,18 +91,25 @@ def restruct_render(input_file, output_file):
         fd.write(txt_context)
 
 
-# as_line('./train', 'rec_gt_train.txt')
-# as_line('./test', 'rec_gt_test.txt')
+input_dir = sys.argv[1]
+output_dir = sys.argv[2]
+region = sys.argv[3]
 
-restruct_render('./output/render/zh_CN/short/default/train.txt', 'rec_gt_train.txt')
-restruct_render('./output/render/zh_CN/short/default/test.txt', 'rec_gt_test.txt')
-restruct_render('./output/render/zh_CN/long/default/train.txt', 'rec_gt_train.txt')
-restruct_render('./output/render/zh_CN/long/default/test.txt', 'rec_gt_test.txt')
+output_train_file = os.path.join(output_dir, '/rec_gt_train.txt')
+output_test_file = os.path.join(output_dir, '/rec_gt_test.txt')
 
-# restruct_render('./render_long/default/test.txt', 'rec_gt_test.txt')
-# restruct_render('./render_short/default/test.txt', 'rec_gt_test.txt')
+if os.path.exists(os.path.join('./my_data', region, 'train')):
+    as_line(os.path.join('./my_data', region, 'train'), output_train_file)
 
-restruct_render('./output/render/numbers/default/train.txt', 'rec_gt_train.txt')
-restruct_render('./output/render/numbers/default/test.txt', 'rec_gt_test.txt')
+if os.path.exists(os.path.join('./my_data', region, 'test')):
+    as_line(os.path.join('./my_data', region, 'test'), output_test_file)
 
-# add_keys('raw_keys.txt', 'keys.txt')
+for path, _, files in os.walk(input_dir):
+    for f in files:
+        if f == 'train.txt':
+            restruct_render(os.path.join(path, f), output_train_file)
+        elif f == 'test.txt':
+            restruct_render(os.path.join(path, f), output_test_file)
+
+add_keys(os.path.join('raw_keys', region + '.txt'),
+         os.path.join(output_dir, 'keys.txt'))
