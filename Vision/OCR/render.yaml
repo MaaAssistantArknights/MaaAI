@@ -48,7 +48,7 @@ crop:
 
 # Use image in bg_dir as background for text
 img_bg:
-  enable: true
+  enable: false
   fraction: 0.5
 
 # Not work when random_space applied

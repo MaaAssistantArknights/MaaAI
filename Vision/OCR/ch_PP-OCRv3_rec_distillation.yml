@@ -151,7 +151,7 @@ Train:
     data_dir: ./
     ext_op_transform_idx: 1
     label_file_list:
-    - ./output/zh_CN/output/rec_gt_train.txt
+    - ./output/zh_CN/rec_gt_train.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
@@ -182,7 +182,7 @@ Eval:
     name: SimpleDataSet
     data_dir: ./
     label_file_list:
-    - ./output/zh_CN/output/rec_gt_test.txt
+    - ./output/zh_CN/rec_gt_test.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
