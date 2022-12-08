@@ -4,13 +4,13 @@ Global:
   epoch_num: 800
   log_smooth_window: 20
   print_batch_step: 10
-  save_model_dir: ./output/zh_CN/model
+  save_model_dir: ./output/zh_CN/model/epoch
   save_epoch_step: 1
   eval_batch_step: [1000, 2000]
   cal_metric_during_train: true
   pretrained_model: ./pretrained_model/ch_PP-OCRv3_rec_train/best_accuracy
-  # checkpoints: ./output/zh_CN/model/latest
-  save_inference_dir: ./output/zh_CN/output/inference
+  # checkpoints: ./output/zh_CN/model/epoch/latest
+  save_inference_dir: ./output/zh_CN/model/inference
   use_visualdl: false
   character_dict_path: ./output/zh_CN/keys.txt
   max_text_length: &max_text_length 25
