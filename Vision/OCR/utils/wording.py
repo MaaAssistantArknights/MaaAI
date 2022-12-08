@@ -28,6 +28,8 @@ def parse_line(line):
                     wording = wording.replace("\\n", "\n")
                     wording = wording.replace("\\t", "\n")
                     wording = wording.replace("\t", "\n")
+                    wording = wording.replace("......", "\n")
+                    wording = wording.replace("\r", "")
                     wording = wording.replace(" ", "")
                     result.update(
                         set([w for w in wording.split("\n") if w and w != ' ']))
@@ -70,7 +72,7 @@ for k in all_context:
     if ord(k) <= 32:
         continue
     keys.add(k)
-with open('raw_keys/cn.txt', 'r', encoding='utf-8') as f:
+with open('raw_keys/zh_CN.txt', 'r', encoding='utf-8') as f:
     key_text = f.read()
 for k in keys:
     if k not in key_text:

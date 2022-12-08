@@ -8,7 +8,7 @@ corpus_dir = output_dir + '/corpus/'
 os.makedirs(corpus_dir, exist_ok=True)
 
 def generate_keys():
-    with open('raw_keys/en.txt', mode='r', encoding="utf-8") as f:
+    with open('raw_keys/en_US.txt', mode='r', encoding="utf-8") as f:
         keys = f.read()
 
     keys += '万\n萬\n만\n亿\n億\n억\n'
