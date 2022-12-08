@@ -2,19 +2,8 @@ import os
 import json
 import random
 
-output_dir = 'output/numbers/'
-os.makedirs(output_dir, exist_ok=True)
-corpus_dir = output_dir + '/corpus/'
+corpus_dir = 'output/zh_CN/number/'
 os.makedirs(corpus_dir, exist_ok=True)
-
-def generate_keys():
-    with open('raw_keys/en_US.txt', mode='r', encoding="utf-8") as f:
-        keys = f.read()
-
-    keys += '万\n萬\n만\n亿\n億\n억\n'
-
-    with open(output_dir + 'keys.txt', 'w', encoding="utf-8") as f:
-        f.write(keys)
 
 
 def generate_stages():
@@ -32,34 +21,40 @@ def generate_stages():
         if not cn_code:
             all_stages_code.add(code)
 
-    with open(corpus_dir + 'stages.txt', 'w', encoding="utf-8") as f:
-        f.write('\n'.join(all_stages_code))
+    with open(corpus_dir + 'numbers.txt', 'w', encoding="utf-8") as f:
+        f.write('\n'.join(all_stages_code) + '\n')
 
 
 def generate_numbers():
-    numbers = [str(x) for x in range(1, 10000)]
+    numbers = []
+    unit = '万'
     for i in range(1, 10000):
-        for unit in ['万',  '萬',  '만']:
+        if (1.0 / i * 3) > random.random():
             numbers.append(str(i) + unit)
+        if (1.0 / i * 3) > random.random():
             for d in range(1, 10):
-                numbers.append(str(i) + '.' + str(d) + unit)
+                if random.random() < 0.1:
+                    numbers.append(str(i) + '.' + str(d) + unit)
+                    break
 
+    unit = '亿'
     for i in range(1, 100):
-        for unit in ['亿', '億', '억']:
+        if random.random() < 0.01:
             numbers.append(str(i) + unit)
-            for d in range(1, 10):
+        for d in range(1, 10):
+            if random.random() < 0.01:
                 numbers.append(str(i) + '.' + str(d) + unit)
+                break
 
-    for i in range(1, 1000):
-        for unit in ['K', 'M']:
-            numbers.append(str(i) + unit)
-            for d in range(1, 10):
-                numbers.append(str(i) + '.' + str(d) + unit)
+    # for i in range(1, 1000):
+    #     for unit in ['K', 'M']:
+    #         numbers.append(str(i) + unit)
+    #         for d in range(1, 10):
+    #             numbers.append(str(i) + '.' + str(d) + unit)
 
-    numbers = random.sample(numbers, 500)
-    numbers += [str(x) for x in range(1, 500)]
-    with open(corpus_dir + 'numbers.txt', 'w', encoding="utf-8") as f:
-        f.write('\n'.join(numbers))
+    numbers += [str(x) for x in range(1, 400)]
+    with open(corpus_dir + 'numbers.txt', 'a', encoding="utf-8") as f:
+        f.write('\n'.join(numbers) + '\n')
 
 
 def generate_other():
@@ -70,11 +65,10 @@ def generate_other():
     # All Chars
     numbers += [chr(x) for x in range(33, 127)]
 
-    with open(corpus_dir + 'other.txt', 'w', encoding="utf-8") as f:
-        f.write('\n'.join(numbers))
+    with open(corpus_dir + 'numbers.txt', 'a', encoding="utf-8") as f:
+        f.write('\n'.join(numbers) + '\n')
 
 
-generate_keys()
 generate_stages()
-generate_numbers()
 generate_other()
+generate_numbers()
