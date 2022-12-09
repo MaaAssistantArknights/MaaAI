@@ -35,8 +35,8 @@ python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file 
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/zh_CN/long/ --corpus_mode=chn --length=7 --num_img $num_long_img --chars_file=output/zh_CN/keys.txt --strict --output_dir=$render/zh_CN/long
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/zh_CN/number/ --corpus_mode=list --num_img $num_number_img --chars_file=output/zh_CN/keys.txt --strict --output_dir=$render/zh_CN/number
 
-python ./utils/half_and_half.py $render/zh_CN/short/default/tmp_labels.txt $render/zh_CN/short/default
-python ./utils/half_and_half.py $render/zh_CN/long/default/tmp_labels.txt $render/zh_CN/long/default
-python ./utils/half_and_half.py $render/zh_CN/number/default/tmp_labels.txt $render/zh_CN/number/default
+python3 ./utils/half_and_half.py $render/zh_CN/short/default/tmp_labels.txt $render/zh_CN/short/default
+python3 ./utils/half_and_half.py $render/zh_CN/long/default/tmp_labels.txt $render/zh_CN/long/default
+python3 ./utils/half_and_half.py $render/zh_CN/number/default/tmp_labels.txt $render/zh_CN/number/default
 
-python ./utils/rename_for_ppocr.py ./output/render/zh_CN ./output/zh_CN zh_CN
+python3 ./utils/rename_for_ppocr.py ./output/render/zh_CN ./output/zh_CN zh_CN
