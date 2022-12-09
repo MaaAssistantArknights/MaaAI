@@ -1,4 +1,5 @@
-echo "不建议直接执行，最好照着敲，有哪步报错了及时解决下"
+echo "注意请 cd 到当前目录下再运行！"
+echo "国内用户请挂代理，或者自己想办法将以下 repo 及字体资源放到对应目录下"
 
 if [ ! -d 'ArknightsGameData' ]; then
     git clone https://github.com/Kengxxiao/ArknightsGameData --depth=1
@@ -12,21 +13,24 @@ else
     git -C text_renderer pull
 fi
 
-render='output/render'
-num_img=100000
-
 fonts_dir='fonts'
 wget https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansCN.zip -P $fonts_dir
 yes | unzip fonts/SourceHanSansCN.zip -d $fonts_dir
 
 ls $PWD/$fonts_dir/SubsetOTF/CN/* > $fonts_dir/fonts.txt
 
+###### 以下是离线操作了 ######
+
+num_img=100000  # 总的生成图片数量
+
+python3 ./utils/wording.py
+python3 ./utils/number.py
+
 num_img_fraction=`expr $num_img / 100`
 num_short_img=`expr $num_img_fraction \* 28`
 num_long_img=`expr $num_img_fraction \* 70`
 num_number_img=`expr $num_img_fraction \* 2`
-python3 ./utils/wording.py
-python3 ./utils/number.py
+render='output/render'
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/zh_CN/short/ --corpus_mode=list --num_img $num_short_img --chars_file=output/zh_CN/keys.txt --strict --output_dir=$render/zh_CN/short
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/zh_CN/long/ --corpus_mode=chn --length=7 --num_img $num_long_img --chars_file=output/zh_CN/keys.txt --strict --output_dir=$render/zh_CN/long
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/zh_CN/number/ --corpus_mode=list --num_img $num_number_img --chars_file=output/zh_CN/keys.txt --strict --output_dir=$render/zh_CN/number
