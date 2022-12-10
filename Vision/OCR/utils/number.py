@@ -1,13 +1,18 @@
 import os
 import json
 import random
+import sys
 
-corpus_dir = 'output/zh_CN/number/'
+client = sys.argv[1]
+
+corpus_dir = f'output/{client}/number/'
 os.makedirs(corpus_dir, exist_ok=True)
 
 
 def generate_stages():
-    with open('ArknightsGameData/zh_CN/gamedata/excel/stage_table.json', 'r', encoding="utf-8") as f:
+    with open(f'ArknightsGameData/{client}/gamedata/excel/stage_table.json',
+              'r',
+              encoding="utf-8") as f:
         stages_json = json.loads(f.read())['stages']
 
     all_stages_code = set()
@@ -27,7 +32,13 @@ def generate_stages():
 
 def generate_numbers():
     numbers = []
-    unit = '万'
+    W_map = {
+        "zh_CN": "万",
+        "zh_TW": "萬",
+        "ja_JP": "万",
+        "ko_KR": "만"
+    }
+    unit = W_map[client]
     for i in range(1, 10000):
         if (1.0 / i * 3) > random.random():
             numbers.append(str(i) + unit)
@@ -37,7 +48,13 @@ def generate_numbers():
                     numbers.append(str(i) + '.' + str(d) + unit)
                     break
 
-    unit = '亿'
+    E_map = {
+        "zh_CN": "亿",
+        "zh_TW": "億",
+        "ja_JP": "億",
+        "ko_KR": "억"
+    }
+    unit = E_map[client]
     for i in range(1, 100):
         if random.random() < 0.01:
             numbers.append(str(i) + unit)

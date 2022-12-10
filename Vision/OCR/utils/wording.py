@@ -1,6 +1,8 @@
 import re
 import os
+import sys
 
+client = sys.argv[1]
 
 def parse_line(line):
     result = set()
@@ -56,7 +58,6 @@ def find_all_wording(dir):
 # for root, dirs, _ in os.walk('ArknightsGameData'):
 #     for client in dirs:
 
-client = 'zh_CN'
 wording = find_all_wording(os.path.join(
     'ArknightsGameData', client, 'gamedata', 'excel'))
 wording.update(set([chr(x) for x in range(33, 127)]))
@@ -72,7 +73,7 @@ for k in all_context:
     if ord(k) <= 32:
         continue
     keys.add(k)
-with open('raw_keys/zh_CN.txt', 'r', encoding='utf-8') as f:
+with open(f'raw_keys/{client}.txt', 'r', encoding='utf-8') as f:
     key_text = f.read()
 for k in keys:
     if k not in key_text:
