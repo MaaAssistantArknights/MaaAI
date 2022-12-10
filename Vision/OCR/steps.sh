@@ -24,7 +24,7 @@ wget https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/Sou
 num_img=100000  # 总的生成图片数量
 client="zh_CN"  # 生成哪种语言的图片，"zh_CN" | "zh_TW" | "ja_JP" | "ko_KR"
 
-yes | unzip fonts/SourceHanSansCN.zip -d $fonts_dir
+yes | unzip fonts/SourceHanSans$fontLang.zip -d $fonts_dir
 ls $PWD/$fonts_dir/SubsetOTF/$fontLang/* > $fonts_dir/fonts.txt
 
 python3 ./utils/wording.py $client
