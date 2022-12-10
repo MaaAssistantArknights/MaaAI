@@ -8,7 +8,7 @@ Global:
   save_epoch_step: 3
   eval_batch_step: [1000, 2000]
   cal_metric_during_train: true
-  pretrained_model: ./pretrained_model/chinese_cht_PP-OCRv3_rec_train/best_accuracy
+  pretrained_model: ./pretrained_model/korean_PP-OCRv3_rec_train/best_accuracy
   # checkpoints: ./output/ko_KR/model/epoch/latest
   save_inference_dir: ./output/ko_KR/model/inference
   use_visualdl: false
