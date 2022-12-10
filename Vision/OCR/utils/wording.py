@@ -1,8 +1,21 @@
 import re
 import os
 import sys
+from fontTools.ttLib import TTFont
 
 client = sys.argv[1]
+
+unicode_map = {}
+
+font_dir = os.path.join("fonts/SubsetOTF", client.split('_')[1])
+for f in os.listdir(font_dir):
+    if not f.endswith("otf"):
+        continue
+    fontType = os.path.join(font_dir, f)
+    font = TTFont(fontType)
+    unicode_map = font['cmap'].tables[0].ttFont.getBestCmap()
+    break
+
 
 def parse_line(line):
     result = set()
@@ -33,8 +46,18 @@ def parse_line(line):
                     wording = wording.replace("......", "\n")
                     wording = wording.replace("\r", "")
                     wording = wording.replace(" ", "")
-                    result.update(
-                        set([w for w in wording.split("\n") if w and w != ' ']))
+                    lines = [line for line in wording.split(
+                        "\n") if line and line != ' ']
+                    loc_lines = set()
+                    for l in lines:
+                        not_support = False
+                        for w in l:
+                            if ord(w) not in unicode_map.keys():
+                                not_support = True
+                                break
+                        if not not_support:
+                            loc_lines.add(l)
+                    result.update(loc_lines)
             in_string = not in_string
             has_non_ascii = False
         elif in_string and ord(char) > 127:
