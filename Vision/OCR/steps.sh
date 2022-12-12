@@ -47,9 +47,9 @@ python3 ./utils/wording.py $client
 python3 ./utils/number.py $client
 
 num_img_fraction=`expr $num_img / 100`
-num_short_img=`expr $num_img_fraction \* 28`
-num_long_img=`expr $num_img_fraction \* 70`
-num_number_img=`expr $num_img_fraction \* 2`
+num_short_img=`expr $num_img_fraction \* 30`
+num_long_img=`expr $num_img_fraction \* 60`
+num_number_img=`expr $num_img_fraction \* 10`
 output='output/render' # 下面有些 python 脚本是 hardcode的，这里的输出目录不建议修改
 
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/$client/short/ --corpus_mode=list --num_img $num_short_img --chars_file=output/$client/keys.txt --strict --output_dir=$output/$client/short

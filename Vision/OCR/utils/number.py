@@ -40,9 +40,9 @@ def generate_numbers():
     }
     unit = W_map[client]
     for i in range(1, 10000):
-        if (1.0 / i * 3) > random.random():
+        if (5.0 / i) > random.random():
             numbers.append(str(i) + unit)
-        if (1.0 / i * 3) > random.random():
+        if (5.0 / i) > random.random():
             for d in range(1, 10):
                 if random.random() < 0.1:
                     numbers.append(str(i) + '.' + str(d) + unit)
@@ -56,12 +56,13 @@ def generate_numbers():
     }
     unit = E_map[client]
     for i in range(1, 100):
-        if random.random() < 0.01:
+        if (5.0 / i) > random.random():
             numbers.append(str(i) + unit)
-        for d in range(1, 10):
-            if random.random() < 0.01:
-                numbers.append(str(i) + '.' + str(d) + unit)
-                break
+        if (5.0 / i) > random.random():
+            for d in range(1, 10):
+                if random.random() < 0.01:
+                    numbers.append(str(i) + '.' + str(d) + unit)
+                    break
 
     # for i in range(1, 1000):
     #     for unit in ['K', 'M']:
