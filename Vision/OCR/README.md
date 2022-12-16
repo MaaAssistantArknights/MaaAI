@@ -70,27 +70,37 @@
 
 只是个大致的流程，都还是 PaddleOCR 的那套，更多详细的参数等请参考 PaddleOCR 的文档
 
-## 训练方法(Docker)
-如果你是用恰好有nvidia-docker并且不想折腾环境可以试试Docker, 本教程假设你知道一些常用的
+## 训练方法 (Docker)
+
+如果你是用恰好有 nvidia-docker 并且不想折腾环境可以试试 Docker, 本教程假设你知道一些常用的 Docker 命令
+
 0. 依赖
-- `docker` 以及 `nvidia-docker` 具体安装流程参考[Nvidia文档](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) 
-- 对应版本的CUDA, 本仓库提供的Dockerfile默认版本支持nvidia驱动版本>=515 (CUDA >= 11.7)
+
+- `docker` 以及 `nvidia-docker` 具体安装流程参考 [Nvidia文档](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) 
+- 对应版本的 CUDA, 本仓库提供的 Dockerfile 默认版本支持 nvidia 驱动版本 >= 515 (CUDA >= 11.7)
+
 1. 获取镜像
+
     ```bash
     docker build -t maa_train . \   # 以下为可选参数
         --build-arg VERSION=22.05 \ # Nvdia 镜像的版本，默认为22.05， 可选的版本参考之前的链接
         --build-arg OCR_LANG=zh_CN \ # 训练数据集的语言，docker将拷贝对应语言数据集到镜像，默认zh_CN, 可选`zh_CN | ja_JP | zh_TW | en_US`
         --build_arg PRETRAINED_MODEL=ch_PP-OCRv3_rec_distillation # 预训练模型权重名称, 默认为简中知识蒸馏模型
     ``` 
+
 2. 运行镜像
+
     ```bash
-    # 如果启动失败，可尝试删除 --ulimit memlock=-1 或者添加sudo运行
+    # 如果启动失败，可尝试删除 --ulimit memlock=-1 或者添加 sudo 运行
     docker --gpus all --shm-size=1g --ulimit memlock=-1 run -it maa_train /bin/bash
     ```
+
     进入容器后，将第六步中PaddleOCR的位置替换为`../PaddleOCR`，即
-    ```
+
+    ```bash
     python ../PaddleOCR/tools/train.py -c ch_PP-OCRv3_rec_distillation.yml 
     ```
+
 ## 开源库
 
 - [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR): Awesome multilingual OCR toolkits based on PaddlePaddle
