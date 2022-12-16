@@ -1,7 +1,7 @@
 ARG OCR_LANG=zh_CN
 ARG PRETRAINED_MODEL=ch_PP-OCRv3_rec_distillation
-
-FROM nvcr.io/nvidia/paddlepaddle:22.05-py3
+ARG VERSION=22.05
+FROM nvcr.io/nvidia/paddlepaddle:{22.05}-py3
 
 RUN git clone https://gitee.com/paddlepaddle/PaddleOCR.git  /PaddleOCR  --depth=1 && \
     cd /PaddleOCR && \
