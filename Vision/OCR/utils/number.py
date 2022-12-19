@@ -67,15 +67,15 @@ def main(args):
     # Write stages
     stages = generate_stages(args.game_data / args.lang / "gamedata" /
                              "excel" / "stage_table.json")
-    f.writelines(stages)
+    f.write('\n'.join(stages) + '\n')
 
     # write others
     others = generate_other()
-    f.writelines(others)
+    f.write('\n'.join(others) + '\n')
     # generate numbers
     numbers_size = (args.total, int(args.total * args.ratio_100m))
     numbers = generate_numbers(args.lang, numbers_size)
-    f.writelines(numbers)
+    f.write('\n'.join(numbers) + '\n')
 
     f.close()
 
@@ -97,12 +97,12 @@ def parse_args():
     parser.add_argument(
         "--ratio_100m",
         "-r",
-        default=20 / 10000,
+        default=2 / 100,
         type=float,
         help="proportation for numbers >= 100m, default to 2/1000")
     parser.add_argument("--total",
                         "-t",
-                        default=10000,
+                        default=1000,
                         type=int,
                         help="total numbers to be generated, default to 10000")
     return parser.parse_args()
