@@ -10,7 +10,7 @@ font_color:
   blue:
     fraction: 0.5
     l_boundary: [0,0,150]
-    h_boundary: [60,60,255]
+    h_boundary: [60,60,253]
   brown:
     fraction: 0.5
     l_boundary: [139,70,19]
@@ -138,7 +138,7 @@ line_color:
   blue:
     fraction: 0.5
     l_boundary: [0,0,150]
-    h_boundary: [60,60,255]
+    h_boundary: [60,60,253]
 
 # These operates are applied on the final output image,
 # so actually it can also be applied in training process as an data augmentation method.

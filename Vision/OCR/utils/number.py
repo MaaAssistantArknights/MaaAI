@@ -8,10 +8,6 @@ from pathlib import Path
 
 ClientLang = Union[Literal['zh_CN'], Literal['en_US'], Literal['ja_JP'],
                    Literal['ko_KR'], Literal['zh_TW'], ]
-client = sys.argv[1]
-
-OUTPUT_DIR = f'output/{client}/number/'
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 def uniform_exponent_range(base: float, lo: float, hi: float, size: int):
@@ -26,7 +22,9 @@ def generate_stages(stages: Union[dict, str]):
         with open(stages, 'r', encoding="utf-8") as f:
             stages = json.loads(f.read())['stages']
     # Iterate through all the data
-    all_stages_code = [code for code in stages.values() if code.is_ascii()]
+    all_stages_code = [
+        stage['code'] for stage in stages.values() if stage['code'].isascii()
+    ]
     return all_stages_code
 
 
@@ -63,7 +61,8 @@ def generate_other():
 
 
 def main(args):
-    output_dir = Path(args.output_dir) / args.lang
+    output_dir = Path(args.output_dir) / args.lang / "number"
+    os.makedirs(output_dir, exist_ok=True)
     f = open(output_dir / 'numbers.txt', 'w', encoding="utf-8")
     # Write stages
     stages = generate_stages(args.game_data / args.lang / "gamedata" /
@@ -87,7 +86,7 @@ def parse_args():
                         "-l",
                         choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR"),
                         help="target language, default to \"zh_CN\"",
-                        default="zh-CN")
+                        default="zh_CN")
     parser.add_argument(
         "--game_data",
         "-g",

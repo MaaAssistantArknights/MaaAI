@@ -21,21 +21,21 @@ fi
 python3 -m pip install -r text_renderer/requirements.txt
 
 fonts_dir='fonts'
-wget https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSans$fontLang.zip -P $fonts_dir
+wget -nc https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSans$fontLang.zip -P $fonts_dir
 
 # 下载你需要的哪个语言的即可，这几个应该不用挂代理也行
 pretrained_model="pretrained_model"
 
-wget https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_train.tar -P $pretrained_model
+wget -nc https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_train.tar -P $pretrained_model
 tar -xvf $pretrained_model/ch_PP-OCRv3_rec_train.tar -C $pretrained_model
 
-wget https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/chinese_cht_PP-OCRv3_rec_train.tar -P $pretrained_model
+wget -nc https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/chinese_cht_PP-OCRv3_rec_train.tar -P $pretrained_model
 tar -xvf $pretrained_model/chinese_cht_PP-OCRv3_rec_train.tar -C $pretrained_model
 
-wget https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/japan_PP-OCRv3_rec_train.tar -P $pretrained_model
+wget -nc https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/japan_PP-OCRv3_rec_train.tar -P $pretrained_model
 tar -xvf $pretrained_model/japan_PP-OCRv3_rec_train.tar -C $pretrained_model
 
-wget https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/korean_PP-OCRv3_rec_train.tar -P $pretrained_model
+wget -nc https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/korean_PP-OCRv3_rec_train.tar -P $pretrained_model
 tar -xvf $pretrained_model/korean_PP-OCRv3_rec_train.tar -C $pretrained_model
 
 
