@@ -45,7 +45,7 @@ yes | unzip fonts/SourceHanSans$fontLang.zip -d $fonts_dir
 ls $PWD/$fonts_dir/SubsetOTF/$fontLang/* > $fonts_dir/fonts.txt
 
 python3 ./utils/wording.py $client
-python3 ./utils/number.py $client
+python3 ./utils/number.py -l $client
 
 num_img_fraction=`expr $num_img / 100`
 num_short_img=`expr $num_img_fraction \* 30`
@@ -57,8 +57,8 @@ python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file 
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/$client/long/ --corpus_mode=chn --length=7 --num_img $num_long_img --chars_file=output/$client/keys.txt --strict --output_dir=$output/$client/long
 python3 ./text_renderer/main.py --fonts_list $fonts_dir/fonts.txt --config_file render.yaml --img_width=0 --corpus_dir output/$client/number/ --corpus_mode=list --num_img $num_number_img --chars_file=output/$client/keys.txt --strict --output_dir=$output/$client/number
 
-python3 ./utils/half_and_half.py $output/$client/short/default/tmp_labels.txt $output/$client/short/default
-python3 ./utils/half_and_half.py $output/$client/long/default/tmp_labels.txt $output/$client/long/default
-python3 ./utils/half_and_half.py $output/$client/number/default/tmp_labels.txt $output/$client/number/default
+python3 ./utils/train_test_split.py $output/$client/short/default/tmp_labels.txt -o $output/$client/short/default
+python3 ./utils/train_test_split.py $output/$client/long/default/tmp_labels.txt -o $output/$client/long/default
+python3 ./utils/train_test_split.py $output/$client/number/default/tmp_labels.txt -o $output/$client/number/default
 
 python3 ./utils/rename_for_ppocr.py ./output/render/$client ./output/$client $client
