@@ -2,77 +2,52 @@ import os
 import json
 import random
 import sys
+from typing import Literal, Union, Tuple
+import argparse as A
+from pathlib import Path
 
-client = sys.argv[1]
-
-corpus_dir = f'output/{client}/number/'
-os.makedirs(corpus_dir, exist_ok=True)
-
-
-def generate_stages():
-    with open(f'ArknightsGameData/{client}/gamedata/excel/stage_table.json',
-              'r',
-              encoding="utf-8") as f:
-        stages_json = json.loads(f.read())['stages']
-
-    all_stages_code = set()
-    for _, v in stages_json.items():
-        code = v['code']
-        cn_code = False
-        for k in code:
-            if ord(k) > 127:
-                cn_code = True
-                break
-        if not cn_code:
-            all_stages_code.add(code)
-
-    with open(corpus_dir + 'numbers.txt', 'w', encoding="utf-8") as f:
-        f.write('\n'.join(all_stages_code) + '\n')
+ClientLang = Union[Literal['zh_CN'], Literal['en_US'], Literal['ja_JP'],
+                   Literal['ko_KR'], Literal['zh_TW'], ]
 
 
-def generate_numbers():
+def uniform_exponent_range(base: float, lo: float, hi: float, size: int):
+    for _ in range(size):
+        exponent = random.uniform(lo, hi)
+        yield base**exponent
+
+
+def generate_stages(stages: Union[dict, str]):
+    # open stage json
+    if isinstance(stages, (str, Path)):
+        with open(stages, 'r', encoding="utf-8") as f:
+            stages = json.loads(f.read())['stages']
+    # Iterate through all the data
+    all_stages_code = [
+        stage['code'] for stage in stages.values() if stage['code'].isascii()
+    ]
+    return all_stages_code
+
+
+def generate_numbers(lang: ClientLang, counts: Tuple = (10000, 20)):
     numbers = []
-    W_map = {
-        "zh_CN": "万",
-        "zh_TW": "萬",
-        "ja_JP": "万",
-        "ko_KR": "만"
-    }
-    unit = W_map[client]
-    for i in range(1, 10000):
-        if (5.0 / i) > random.random():
-            numbers.append(str(i) + unit)
-        if (5.0 / i) > random.random():
-            for d in range(1, 10):
-                if random.random() < 0.1:
-                    numbers.append(str(i) + '.' + str(d) + unit)
-                    break
 
-    E_map = {
-        "zh_CN": "亿",
-        "zh_TW": "億",
-        "ja_JP": "億",
-        "ko_KR": "억"
+    UNITS_BY_LANG = {
+        "zh_CN": "万亿",
+        "zh_TW": "萬億",
+        "ja_JP": "万億",
+        "ko_KR": "만억",
     }
-    unit = E_map[client]
-    for i in range(1, 100):
-        if (5.0 / i) > random.random():
-            numbers.append(str(i) + unit)
-        if (5.0 / i) > random.random():
-            for d in range(1, 10):
-                if random.random() < 0.01:
-                    numbers.append(str(i) + '.' + str(d) + unit)
-                    break
-
-    # for i in range(1, 1000):
-    #     for unit in ['K', 'M']:
-    #         numbers.append(str(i) + unit)
-    #         for d in range(1, 10):
-    #             numbers.append(str(i) + '.' + str(d) + unit)
+    for i, count in enumerate(counts):
+        unit = UNITS_BY_LANG[lang][i]
+        rng = uniform_exponent_range(10, 1, 5, count)
+        for v in rng:
+            if random.random() < 0.1:
+                numbers.append(f"{v:.1}{unit}")
+            else:
+                numbers.append(f"{int(v)}{unit}")
 
     numbers += [str(x) for x in range(1, 400)]
-    with open(corpus_dir + 'numbers.txt', 'a', encoding="utf-8") as f:
-        f.write('\n'.join(numbers) + '\n')
+    return numbers
 
 
 def generate_other():
@@ -82,11 +57,57 @@ def generate_other():
 
     # All Chars
     numbers += [chr(x) for x in range(33, 127)]
-
-    with open(corpus_dir + 'numbers.txt', 'a', encoding="utf-8") as f:
-        f.write('\n'.join(numbers) + '\n')
+    return numbers
 
 
-generate_stages()
-generate_other()
-generate_numbers()
+def main(args):
+    output_dir = Path(args.output_dir) / args.lang / "number"
+    os.makedirs(output_dir, exist_ok=True)
+    f = open(output_dir / 'numbers.txt', 'w', encoding="utf-8")
+    # Write stages
+    stages = generate_stages(args.game_data / args.lang / "gamedata" /
+                             "excel" / "stage_table.json")
+    f.write('\n'.join(stages) + '\n')
+
+    # write others
+    others = generate_other()
+    f.write('\n'.join(others) + '\n')
+    # generate numbers
+    numbers_size = (args.total, int(args.total * args.ratio_100m))
+    numbers = generate_numbers(args.lang, numbers_size)
+    f.write('\n'.join(numbers) + '\n')
+
+    f.close()
+
+
+def parse_args():
+    parser = A.ArgumentParser()
+    parser.add_argument("--lang",
+                        "-l",
+                        choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR"),
+                        help="target language, default to \"zh_CN\"",
+                        default="zh_CN")
+    parser.add_argument(
+        "--game_data",
+        "-g",
+        default="ArknightsGameData",
+        type=Path,
+        help="path to game_data, default to \"ArknightsGameData\"")
+    parser.add_argument("--output_dir", "-o", default='./output', type=Path)
+    parser.add_argument(
+        "--ratio_100m",
+        "-r",
+        default=2 / 100,
+        type=float,
+        help="proportation for numbers >= 100m, default to 2/1000")
+    parser.add_argument("--total",
+                        "-t",
+                        default=1000,
+                        type=int,
+                        help="total numbers to be generated, default to 10000")
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
