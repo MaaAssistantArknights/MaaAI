@@ -8,8 +8,9 @@
 ![skill_ready_2](https://user-images.githubusercontent.com/18511905/223743166-cc6143c4-3c02-4495-b0da-6f1dcd724393.png)
 ![skill_ready_3](https://user-images.githubusercontent.com/18511905/223743312-2cb43115-d3a3-4e69-97c9-74e75ef0baab.png)
 
-二分类 [Inception v1](https://arxiv.org/abs/1409.4842v1) 网络，模型大小 450k，CPU 推理速度在 1ms 以内（输入尺寸 3x64x64）  
-数据集包含了一些传统算法较难处理的情况，准确率在 99.9% 以上
+二分类 [Inception v1](https://arxiv.org/abs/1409.4842v1) 网络，模型大小 450k，CPU 推理速度在 1ms 以内  
+数据集包含了一些传统算法较难处理的情况，准确率在 99% 以上  
+输入需要是 720p 原图下截取的 64x64 的图标（上面三张这种）
 
 - [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Miscellaneous/BattleSkillReadyImageAnalyzer.cpp)
 - [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/inference.py)
