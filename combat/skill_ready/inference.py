@@ -27,9 +27,24 @@ def inference(path):
 ort_session = ort.InferenceSession("checkpoints/best.onnx")
 
 if __name__ == "__main__":
-    rand_y = random.sample(list(Path("datasets/raw/y").glob("*")), 10)
-    rand_n = random.sample(list(Path("datasets/raw/n").glob("*")), 10)
-    for path in rand_y + rand_n:
+    count = 0
+    correct = 0
+    for path in list(Path("datasets/test/y/").glob("*")):
         n_value, y_value = inference(path)
-        out = "y" if y_value > n_value else "n"
-        print(path, "\t", out)
+        out = True if y_value > n_value else False
+        count += 1
+        if out:
+            correct += 1
+        else:
+            print('error', path)
+
+    for path in  list(Path("datasets/test/n/").glob("*")):
+        n_value, y_value = inference(path)
+        out = True if y_value > n_value else False
+        count += 1
+        if not out:
+            correct += 1
+        else:
+            print('error', path)
+
+    print(f'{correct} / {count}, {correct / count}')
