@@ -1,0 +1,2 @@
+ultralytics~=8.0.54
+pypinyin
