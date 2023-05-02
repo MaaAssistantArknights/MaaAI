@@ -11,7 +11,7 @@
 二分类 [Inception v1](https://arxiv.org/abs/1409.4842v1) 网络，模型大小 450k，CPU 推理耗时在 1ms 以内  
 输入需要是 720p 原图下截取的 64x64 的图标（上面三张这种）
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattleSkillReadyImageAnalyzer.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
 - [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/inference.py)
 
 ## [战斗干员（血条）检测](combat/operators)
@@ -21,7 +21,7 @@
 [YOLOv8](https://github.com/ultralytics/ultralytics) N 检测模型，模型大小 12M，CPU 推理耗时约 50ms  
 输入是 16:9 的图片缩放到 640x640
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattleOperatorsImageAnalyzer.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldDetector.cpp)
 
 ## [战斗干员方向识别](combat/deploy_direction)
 
@@ -31,7 +31,7 @@
 四分类 [MnistSimpleCNN](https://arxiv.org/abs/2008.10400) 网络，模型大小 18M，CPU 推理耗时约 20ms  
 输入是 720p 下以格子正中心 96x96 的图片  
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattleDeployDirectionImageAnalyzer.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
 
 ## 其他
 
