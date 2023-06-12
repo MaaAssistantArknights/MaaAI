@@ -1,15 +1,16 @@
 Global:
   debug: false
   use_gpu: true
-  epoch_num: 800
+  #use_amp: true
+  epoch_num: 150
   log_smooth_window: 20
-  print_batch_step: 10
+  print_batch_step: 100
   save_model_dir: ./output/zh_CN/model/epoch
   save_epoch_step: 3
   eval_batch_step: [1000, 2000]
   cal_metric_during_train: true
   pretrained_model: ./pretrained_model/ch_PP-OCRv3_rec_train/best_accuracy
-  # checkpoints: ./output/zh_CN/model/epoch/latest
+  checkpoints: ./output/zh_CN/model/epoch/latest
   save_inference_dir: ./output/zh_CN/model/inference
   use_visualdl: false
   character_dict_path: ./output/zh_CN/keys.txt
@@ -25,8 +26,8 @@ Optimizer:
   beta2: 0.999
   lr:
     name: Piecewise
-    decay_epochs : [700, 800]
-    values : [0.0001, 0.00002]
+    decay_epochs : [70, 150]
+    values : [0.0002, 0.00002]
     warmup_epoch: 5
   regularizer:
     name: L2
@@ -174,9 +175,9 @@ Train:
         - valid_ratio
   loader:
     shuffle: true
-    batch_size_per_card: 128
+    batch_size_per_card: 96
     drop_last: true
-    num_workers: 8
+    num_workers: 16
 Eval:
   dataset:
     name: SimpleDataSet
@@ -200,5 +201,5 @@ Eval:
   loader:
     shuffle: false
     drop_last: false
-    batch_size_per_card: 128
-    num_workers: 8
+    batch_size_per_card: 96
+    num_workers: 16

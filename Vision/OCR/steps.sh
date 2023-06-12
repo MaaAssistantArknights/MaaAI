@@ -1,9 +1,9 @@
 echo "注意请 cd 到当前目录下再运行，并推荐在 python 虚拟环境中运行"
 echo "国内用户请挂代理，或者自己想办法将以下 repo 及字体资源放到对应目录下"
 
-num_img=100000  # 总的生成图片数量
+num_img=200000  # 总的生成图片数量
 client="zh_CN"  # 生成哪种语言的图片，"zh_CN" | "zh_TW" | "ja_JP" | "ko_KR"
-fontLang="CN"   # 下载哪种语言的字体 # "ZH" | "TW" | "JP" | "KR"，和上面的要改一起改
+fontLang="CN"   # 下载哪种语言的字体 # "CN" | "TW" | "JP" | "KR"，和上面的要改一起改
 
 echo "num_img: $num_img, client: $client, fontLang: $fontLang"
 

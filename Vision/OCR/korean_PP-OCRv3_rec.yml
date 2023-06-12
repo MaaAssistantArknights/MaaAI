@@ -1,9 +1,10 @@
 Global:
   debug: false
   use_gpu: true
-  epoch_num: 500
+  #use_amp: true
+  epoch_num: 150
   log_smooth_window: 20
-  print_batch_step: 10
+  print_batch_step: 100
   save_model_dir: ./output/ko_KR/model/epoch
   save_epoch_step: 3
   eval_batch_step: [1000, 2000]
@@ -99,9 +100,9 @@ Train:
         - valid_ratio
   loader:
     shuffle: true
-    batch_size_per_card: 128
+    batch_size_per_card: 96
     drop_last: true
-    num_workers: 8
+    num_workers: 16
 Eval:
   dataset:
     name: SimpleDataSet
@@ -125,5 +126,5 @@ Eval:
   loader:
     shuffle: false
     drop_last: false
-    batch_size_per_card: 128
-    num_workers: 8
+    batch_size_per_card: 96
+    num_workers: 16
