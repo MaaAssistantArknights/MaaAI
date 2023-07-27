@@ -2,6 +2,10 @@
 
 明日方舟相关深度学习模型，最佳实践：[MAA](https://github.com/MaaAssistantArknights/MaaAssistantArknights)
 
+## [光学文字识别](common/OCR)
+
+基于 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 的明日方舟 OCR 模型 finetuning 全流程，包括数据生成、训练、模型转换及优化。详情请参考 [README](common/OCR/README.md)
+
 ## [战斗技能 Ready 识别](combat/skill_ready)
 
 ![skill_ready_1](https://user-images.githubusercontent.com/18511905/223741336-47fce2de-1d09-4b9c-a09e-16c805686d63.png)
