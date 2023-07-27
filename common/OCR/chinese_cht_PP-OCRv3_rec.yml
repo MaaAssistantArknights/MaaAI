@@ -1,0 +1,130 @@
+Global:
+  debug: false
+  use_gpu: true
+  #use_amp: true
+  epoch_num: 150
+  log_smooth_window: 20
+  print_batch_step: 100
+  save_model_dir: ./output/zh_TW/model/epoch
+  save_epoch_step: 3
+  eval_batch_step: [1000, 2000]
+  cal_metric_during_train: true
+  pretrained_model: ./pretrained_model/chinese_cht_PP-OCRv3_rec_train/best_accuracy
+  # checkpoints: ./output/zh_TW/model/epoch/latest
+  save_inference_dir: ./output/zh_TW/model/inference
+  use_visualdl: false
+  character_dict_path: ./output/zh_TW/keys.txt
+  max_text_length: &max_text_length 25
+  infer_mode: false
+  use_space_char: false
+  distributed: true
+
+
+Optimizer:
+  name: Adam
+  beta1: 0.9
+  beta2: 0.999
+  lr:
+    name: Cosine
+    learning_rate: 0.0002
+    warmup_epoch: 5
+  regularizer:
+    name: L2
+    factor: 3.0e-05
+
+
+Architecture:
+  model_type: rec
+  algorithm: SVTR
+  Transform:
+  Backbone:
+    name: MobileNetV1Enhance
+    scale: 0.5
+    last_conv_stride: [1, 2]
+    last_pool_type: avg
+  Head:
+    name: MultiHead
+    head_list:
+      - CTCHead:
+          Neck:
+            name: svtr
+            dims: 64
+            depth: 2
+            hidden_dims: 120
+            use_guide: True
+          Head:
+            fc_decay: 0.00001
+      - SARHead:
+          enc_dim: 512
+          max_text_length: *max_text_length
+
+Loss:
+  name: MultiLoss
+  loss_config_list:
+    - CTCLoss:
+    - SARLoss:
+
+PostProcess:  
+  name: CTCLabelDecode
+
+Metric:
+  name: RecMetric
+  main_indicator: acc
+  ignore_space: False
+
+Train:
+  dataset:
+    name: SimpleDataSet
+    data_dir: ./
+    ext_op_transform_idx: 1
+    label_file_list:
+    - ./output/zh_TW/rec_gt_train.txt
+    transforms:
+    - DecodeImage:
+        img_mode: BGR
+        channel_first: false
+    - RecConAug:
+        prob: 0.5
+        ext_data_num: 2
+        image_shape: [48, 320, 3]
+    - RecAug:
+    - MultiLabelEncode:
+    - RecResizeImg:
+        image_shape: [3, 48, 320]
+    - KeepKeys:
+        keep_keys:
+        - image
+        - label_ctc
+        - label_sar
+        - length
+        - valid_ratio
+  loader:
+    shuffle: true
+    batch_size_per_card: 96
+    drop_last: true
+    num_workers: 16
+Eval:
+  dataset:
+    name: SimpleDataSet
+    data_dir: ./
+    label_file_list:
+    - ./output/zh_TW/rec_gt_test.txt
+    transforms:
+    - DecodeImage:
+        img_mode: BGR
+        channel_first: false
+    - MultiLabelEncode:
+    - RecResizeImg:
+        image_shape: [3, 48, 320]
+    - KeepKeys:
+        keep_keys:
+        - image
+        - label_ctc
+        - label_sar
+        - length
+        - valid_ratio
+  loader:
+    shuffle: false
+    drop_last: false
+    batch_size_per_card: 96
+    num_workers: 16
