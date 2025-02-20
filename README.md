@@ -12,11 +12,13 @@
 ![skill_ready_2](https://user-images.githubusercontent.com/18511905/223743166-cc6143c4-3c02-4495-b0da-6f1dcd724393.png)
 ![skill_ready_3](https://user-images.githubusercontent.com/18511905/223743312-2cb43115-d3a3-4e69-97c9-74e75ef0baab.png)
 
-二分类 [Inception v1](https://arxiv.org/abs/1409.4842v1) 网络，模型大小 450k，CPU 推理耗时在 1ms 以内  
+三分类 [MobileNetv4 Small](https://arxiv.org/abs/2404.10518) 网络，模型大小 9M，CPU 推理耗时在 1ms 以内  
 输入需要是 720p 原图下截取的 64x64 的图标（上面三张这种）
 
+区分三种技能状态，有(y) / 无(n) / 可关闭(c)
+
 - [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
-- [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/inference.py)
+- [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/onnx_inference.py)
 
 ## [战斗干员（血条）检测](combat/operators)
 
