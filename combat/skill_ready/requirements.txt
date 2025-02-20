@@ -1,4 +1,8 @@
 torch
 torchvision
+timm
+scikit-learn
+matplotlib
+pyyaml
 onnx
-onnxruntime
+onnxruntime-gpu

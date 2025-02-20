@@ -1,2 +1,8 @@
-checkpoints
-datasets
+__pycache__
+.vscode
+checkpoints/*
+datasets/*
+eval_logs/*
+logs/*
+*_results.txt
+cppcode/*
