@@ -8,61 +8,63 @@ from core.data_loader import create_loaders, SkillIconDataset
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.utils.data import DataLoader
+from utils.path_manager import get_model_paths
 import onnxruntime as ort
+from torchvision.utils import save_image
+from utils.img_process import unnormalize
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Validate ONNX format model weights')
+    parser.add_argument('--config', help='指定模型配置文件', default='configs/mobilenetv4_conv_small.yaml', type=str, required=True)
+    parser.add_argument('--weights', help='指定onnx路径', type=str)
+    parser.add_argument('--val_path', help='指定验证集路径', default='datasets/val', type=str)
+    args = parser.parse_args()
+    return args
 
 def main():
-    # 命令行参数解析
-    parser = argparse.ArgumentParser(description="验证脚本，可指定验证集路径")
-    parser.add_argument("--val_path", type=str, default="", help="指定验证集路径")
-    args = parser.parse_args()
+    args = parse_args()
 
     # 1. 加载配置文件
-    config_path = os.environ.get('CONFIG_PATH', "configs/mobilenetv4.yaml")
     try:
-        with open(config_path, encoding='utf-8') as f:
+        with open(args.config, encoding='utf-8') as f:
             config = yaml.safe_load(f)
         print("✅ 配置文件加载完成")
     except FileNotFoundError:
-        print(f"❌ 错误：配置文件 {config_path} 不存在")
+        print(f"❌ 错误：配置文件 {args.config} 不存在")
         return
 
     # 2. 初始化设备
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"⚙️ 使用设备: {device}")
+    device = torch.device('cpu')
+    print(f"⚙️  使用设备: {device}")
+    val_batchsize = int(config['training']['batch_size']) * 2  # 检测2遍，有1次错就当错
+    # 获取路径
+    paths = get_model_paths(config)
 
     # 3. 创建数据加载器
     try:
         model_wrapper = create_model(config)
-        if args.val_path:
-            # 从指定路径创建 val_loader
-            val_dataset = SkillIconDataset(
-                root_dir=args.val_path,
-                transform=model_wrapper.val_transform
-            )
-            
-            val_loader = DataLoader(
-                val_dataset,
-                batch_size=int(config['training']['batch_size']) * 2,
-                shuffle=False,
-                num_workers=4,
-                pin_memory=True
-            )
-            print(f"📊 数据加载器统计 | 指定验证集路径: {args.val_path} | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
-        else:
-            # 使用 create_loaders 函数
-            train_loader, val_loader = create_loaders(
-                config,
-                train_transform=model_wrapper.train_transform,
-                val_transform=model_wrapper.val_transform
-            )
-            print(f"📊 数据加载器统计 | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
+        # 从指定路径创建 val_loader
+        val_dataset = SkillIconDataset(
+            root_dir=args.val_path,
+            transform=model_wrapper.val_transform
+        )
+        
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=val_batchsize,
+            shuffle=False,
+            num_workers=4,
+            pin_memory=True
+        )
+        print(f"📊 数据加载器统计 | 指定验证集路径: {args.val_path} | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
     except KeyError as e:
         print(f"❌ 数据加载配置错误: {str(e)}")
         return
 
     # 4. 初始化 ONNX 模型
     try:
-        onnx_path = "checkpoints/mobilenetv4.onnx"
+        if not args.weights:
+            onnx_path = paths['onnx_export']
         if not os.path.exists(onnx_path):
             raise FileNotFoundError(f"ONNX 模型文件 {onnx_path} 不存在")
         
@@ -74,7 +76,7 @@ def main():
 
     # 5. 初始化日志记录器
     logger = MetricLogger(
-        log_dir=os.path.join("eval_logs", config['model']['name']),
+        log_dir=os.path.join("onnx_val"),
         class_names=['c', 'n', 'y'],
         model_name=config['model']['name'],
         class_weights=None
@@ -98,7 +100,7 @@ def main():
         warmup_iters = 10
         test_iters = 100
         
-        print("⏱️ 开始推理速度测试...")
+        print("⏱️  开始推理速度测试...")
         
         # Get input and output names
         input_name = ort_session.get_inputs()[0].name
@@ -124,10 +126,14 @@ def main():
     logger.new_epoch()
     total_samples = 0
 
+    # 创建保存错误图片的 debug 目录
+    debug_base_dir = os.path.join("debug", f"debug_{config['model']['name']}_{time.strftime('%Y%m%d_%H%M%S')}")
+    os.makedirs(debug_base_dir, exist_ok=True)
+
     # 输出文件路径
     output_file = None
     if args.val_path:
-        output_file = open("onnx_results.txt", "w", encoding="utf-8")
+        output_file = open(f"{paths['onnx_dir']}/results_{time.strftime('%Y%m%d_%H%M%S')}.txt", "w", encoding="utf-8")
 
     try:
         with torch.no_grad():
@@ -150,7 +156,8 @@ def main():
                 if output_file:
                     probs = torch.softmax(outputs, dim=1)
                     for i in range(images.size(0)):
-                        image_path = val_loader.dataset.samples[batch_idx * config['training']['batch_size'] + i][0]
+                        index = batch_idx * val_batchsize + i
+                        image_path = val_loader.dataset.samples[index][0]
                         pred_class = torch.argmax(probs[i]).item()
                         true_class = labels[i].item()
                         class_probs = probs[i].tolist()
@@ -160,6 +167,17 @@ def main():
                         output_file.write(f"类别置信度: {[f'{p:.8f}' for p in class_probs]}\n")
                         output_file.write("-" * 50 + "\n")
 
+                        # 如果预测错误，则保存图片到 debug 目录下对应的标签子目录中
+                        if pred_class != true_class:
+                            # 根据预测类别获取对应的子目录 (例如 'c', 'n', 'y')
+                            label_dir = os.path.join(debug_base_dir, logger.class_names[pred_class])
+                            os.makedirs(label_dir, exist_ok=True)
+                            # 从原始图片路径提取文件名
+                            filename = os.path.basename(image_path)
+                            save_path = os.path.join(label_dir, filename)
+                            save_image(unnormalize(images[i].cpu(), device), save_path)
+                            print(f"🛠️  保存错误图片: {save_path}")
+
         print(f"📥 已验证样本总数: {total_samples}")
     except RuntimeError as e:
         print(f"❌ 验证过程异常: {str(e)}")
@@ -167,7 +185,7 @@ def main():
     finally:
         if output_file:
             output_file.close()
-            print("📝 验证结果已保存到 onnx_results.txt")
+            print(f"📝 验证结果已保存到 {paths['onnx_dir']}/results_{time.strftime('%Y%m%d_%H%M%S')}.txt")
 
     # 8. 生成最终报告
     logger.finalize_val()
