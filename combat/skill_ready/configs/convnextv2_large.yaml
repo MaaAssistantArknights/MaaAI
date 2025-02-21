@@ -1,0 +1,24 @@
+model:
+  type: 'timm'  # timm / custom
+  name: "convnextv2_large"
+  pretrained: True
+  num_classes: 3
+  drop_path_rate: 0.1
+
+training:
+  batch_size: 64
+  epochs: 10
+  optimizer:
+    type: "AdamW"
+    lr: 1e-5
+    weight_decay: 0.05
+  use_cuda_amp: True
+
+  lr_scheduler:
+    type: "cosine"
+    warmup_epochs: 5
+
+data:
+  dataset_path: datasets/skill_ready
+  input_size: 64
+  split_ratio: 0.9  # 训练和验证的拆分比例
