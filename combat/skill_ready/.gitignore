@@ -1,8 +1,11 @@
 __pycache__
 .vscode
 checkpoints/*
+onnx/*
 datasets/*
-eval_logs/*
+*_logs/*
 logs/*
 *_results.txt
 cppcode/*
+debug/*
+*.zip
