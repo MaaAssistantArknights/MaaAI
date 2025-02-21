@@ -7,8 +7,7 @@ from abc import ABC, abstractmethod
 class BaseModel(ABC, nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.model_config = config['model']
-        self.data_config = config['data']
+        self.config = config
         self.class_names = ['c', 'n', 'y']
         self.setup_transforms()
         self.setup_class_weights()
@@ -19,7 +18,7 @@ class BaseModel(ABC, nn.Module):
 
     def setup_class_weights(self):
         # 动态计算类别权重
-        dataset_path = self.data_config['dataset_path']
+        dataset_path = self.config['data']['dataset_path']
         class_names = os.listdir(dataset_path)
         class_counts = []
         for class_name in class_names:
@@ -33,7 +32,7 @@ class BaseModel(ABC, nn.Module):
         # 训练集增强流程
         self.train_transform = transforms.Compose([
             transforms.RandomResizedCrop(
-                self.data_config['input_size'],
+                self.config['data']['input_size'],
                 scale=(0.8, 1.0),
                 interpolation=transforms.InterpolationMode.BICUBIC
             ),
@@ -56,11 +55,8 @@ class BaseModel(ABC, nn.Module):
         # 验证集转换流程
         self.val_transform = transforms.Compose([
             transforms.Resize(72),
-            transforms.CenterCrop(self.data_config['input_size']),
+            transforms.CenterCrop(self.config['data']['input_size']),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                std=[0.229, 0.224, 0.225])
         ])
-
-    def export_onnx(self, model_path="base_model.onnx"):
-        pass

@@ -1,14 +1,12 @@
-from models.mobilenetv4 import MobileNetV4Wrapper
-from models.shufflenetv2 import ShuffleNetV2Wrapper
-
-from models.mobilenetv4 import MobileNetV4Wrapper
-from models.shufflenetv2 import ShuffleNetV2Wrapper
+from models.TimmModel import TimmModelWrapper
+from models.CustomModel import CustomModelWrapper
 
 def create_model(config):
-    model_name = config['model']['name']
-    if model_name == 'mobilenetv4':
-        return MobileNetV4Wrapper(config)
-    elif model_name == 'shufflenetv2':
-        return ShuffleNetV2Wrapper(config)
+    model_type = config['model']['type']  # 默认timm类型
+
+    if model_type == 'timm':
+        return TimmModelWrapper(config)
+    elif model_type == 'custom':
+        return CustomModelWrapper(config)  # 预留自定义模型接口
     else:
-        raise ValueError(f"Unsupported model name: {config['model']['name']}")
+        raise ValueError(f'Unsupported model type: {model_type}')
