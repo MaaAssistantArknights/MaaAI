@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 class MetricLogger:
     def __init__(self, log_dir, class_names, model_name, class_weights=None):
-        self.log_dir = os.path.join(log_dir, model_name, time.strftime("%Y%m%d-%H%M%S"))
+        self.log_dir = os.path.join("logs", log_dir, model_name, time.strftime("%Y%m%d-%H%M%S"))
         self.writer = SummaryWriter(self.log_dir)
         self.class_names = class_names
         self.model_size = None
