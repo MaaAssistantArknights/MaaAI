@@ -23,9 +23,9 @@
 ---
 
 ## 2. 模型结构
-参考文件: `models/mobilenetv4.py`
+参考文件: `models/TimmModel.py`
 
-- 使用 `timm` 库创建 `mobilenetv4_conv_small` 模型。
+- 使用 `timm` 库创建 `mobilenetv4_conv_small` 模型 或 其他  `timm` 库支持的模型。
 - 修改分类头以适应小数据集。
 - 模型期望的输入形状为 `(batch_size, 3, input_size, input_size)`，其中 `input_size` 在 `configs/mobilenetv4.yaml` 中定义。
 
