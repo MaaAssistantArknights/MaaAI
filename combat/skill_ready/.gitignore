@@ -1,2 +1,11 @@
-checkpoints
-datasets
+__pycache__
+.vscode
+checkpoints/*
+onnx/*
+datasets/*
+*_logs/*
+logs/*
+*_results.txt
+cppcode/*
+debug/*
+*.zip
