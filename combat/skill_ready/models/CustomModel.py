@@ -29,7 +29,7 @@ class CustomModelWrapper(BaseModel):
 
     def export_onnx(self, output_path, checkpoint_path, load_checkpoint=True):
         """
-        如果 load_checkpoint 为 True，则加载 checkpoint，否则认为模型已经加载好权重，导出一定要加载好权重啊。。。。
+        如果 load_checkpoint 为 True，则加载 checkpoint，否则认为模型已经加载好权重
         """
         if load_checkpoint:
             self.model.load_state_dict(torch.load(checkpoint_path, map_location='cpu'))

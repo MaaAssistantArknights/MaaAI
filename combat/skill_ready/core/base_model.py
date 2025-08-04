@@ -49,7 +49,7 @@ class BaseModel(ABC, nn.Module):
             ),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                               std=[0.229, 0.224, 0.225])
+                                 std=[0.229, 0.224, 0.225])
         ])
 
         # 验证集转换流程
@@ -58,5 +58,5 @@ class BaseModel(ABC, nn.Module):
             transforms.CenterCrop(self.config['data']['input_size']),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                               std=[0.229, 0.224, 0.225])
+                                 std=[0.229, 0.224, 0.225])
         ])

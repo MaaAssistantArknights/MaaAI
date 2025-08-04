@@ -21,4 +21,4 @@ training:
 data:
   dataset_path: datasets/skill_ready
   input_size: 64
-  split_ratio: 0.9  # 训练和验证的拆分比例
+  split_ratio: 0.9  # Training and validation split ratio

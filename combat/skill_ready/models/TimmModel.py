@@ -1,5 +1,4 @@
 import timm
-import torch
 from core.base_model import BaseModel
 
 class TimmModelWrapper(BaseModel):
