@@ -20,6 +20,8 @@
 - [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
 - [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/onnx_inference.py)
 
+使用的数据集现已公开在 [Hugging face](https://huggingface.co/datasets/MaaAssistantArknights/skill_ready) 上
+
 ## [战斗干员（血条）检测](combat/operators)
 
 ![image](https://user-images.githubusercontent.com/18511905/229085758-a32f6379-0eb5-421d-baee-700d327d2f17.png)
