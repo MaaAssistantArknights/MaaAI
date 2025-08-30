@@ -1,6 +1,5 @@
 import torch
-from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
-from torchvision import transforms
+from torch.utils.data import DataLoader, Dataset
 from PIL import Image
 import os
 

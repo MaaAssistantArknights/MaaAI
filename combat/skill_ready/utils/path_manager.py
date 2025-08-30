@@ -1,4 +1,3 @@
-import datetime
 import os
 
 def get_model_paths(config):
