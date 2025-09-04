@@ -7,11 +7,8 @@ from utils.path_manager import get_model_paths
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Export model to ONNX format')
-    parser.add_argument('--config',
-                        default='configs/mobilenetv4_conv_small.yaml',
-                        help='指定模型配置文件',
-                        required=True,
-                        type=str)
+    parser.add_argument('--config', help='指定模型配置文件',
+                        default='configs/mobilenetv4_conv_small.yaml', type=str)
     args = parser.parse_args()
     return args
 
@@ -21,14 +18,14 @@ def main():
     try:
         with open(args.config, encoding='utf-8') as f:
             config = yaml.safe_load(f)
-        print("✅ 配置文件加载完成")
+        print("配置文件加载完成")
     except FileNotFoundError:
-        print(f"❌ 错误：配置文件 {args.config} 不存在")
+        print(f"错误：配置文件 {args.config} 不存在")
         return
 
     # 2. 初始化设备
     device = torch.device("cpu")
-    print(f"⚙️  使用设备: {device}")
+    print(f"使用设备: {device}")
 
     # 3. 获取目标路径
     paths = get_model_paths(config)
@@ -43,9 +40,9 @@ def main():
         # 加载模型 
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
         model.eval()
-        print(f"🔧 已加载最佳模型权重: {checkpoint_path}")
+        print(f"已加载最佳模型权重: {checkpoint_path}")
     except RuntimeError as e:
-        print(f"❌ 模型加载失败: {str(e)}")
+        print(f"模型加载失败: {str(e)}")
         return
 
     try:
@@ -64,9 +61,9 @@ def main():
             output_names=['output'],
             dynamic_axes={'input': {0: 'batch_size'}},
         )
-        print(f"✅ 模型已导出到 {paths['onnx_export']}")
+        print(f"模型已导出到 {paths['onnx_export']}")
     except Exception as e:
-        print(f"❌ 导出 ONNX 模型失败: {str(e)}")
+        print(f"导出 ONNX 模型失败: {str(e)}")
 
 if __name__ == "__main__":
     main()

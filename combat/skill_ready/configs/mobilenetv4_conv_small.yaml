@@ -6,8 +6,10 @@ model:
   drop_path_rate: 0.1
 
 training:
-  batch_size: 64
+  batch_size: 256
   epochs: 30
+  loss:
+    type: "focal" # focal / CE
   optimizer:
     type: "AdamW"
     lr: 1e-5
@@ -19,6 +21,6 @@ training:
     warmup_epochs: 5
 
 data:
-  dataset_path: datasets/skill_ready
+  dataset_path: datasets/train
   input_size: 64
-  split_ratio: 0.9  # 训练和验证的拆分比例
+  split_ratio: 0.9
