@@ -25,7 +25,21 @@ class BaseModel(ABC, nn.Module):
         sqrt_counts = torch.sqrt(class_counts)
         self.class_weights = class_counts.sum() / (sqrt_counts.sum() * sqrt_counts)
 
+    def _resolve_square_input_size(self):
+        input_size = self.config['data']['input_size']
+        if isinstance(input_size, int):
+            return input_size
+        if isinstance(input_size, (list, tuple)):
+            if len(input_size) == 1:
+                return int(input_size[0])
+            if len(input_size) == 2 and int(input_size[0]) == int(input_size[1]):
+                return int(input_size[0])
+        raise ValueError(f"仅支持方形 input_size，当前配置为: {input_size}")
+
     def setup_transforms(self):
+        input_size = self._resolve_square_input_size()
+        runtime_resize_size = int(round(input_size * 72 / 64))
+
         # 训练集增强流程
         self.train_transform = transforms.Compose([
             transforms.RandomResizedCrop(
@@ -55,12 +69,13 @@ class BaseModel(ABC, nn.Module):
                                  std=[0.229, 0.224, 0.225])
         ])
 
-        # 验证集转换流程
+        # 与 Maa 实跑对齐：先放大到 72，再中心裁到 64。
         self.val_transform = transforms.Compose([
             transforms.Resize(
-                (self.config['data']['input_size'], self.config['data']['input_size']),
+                (runtime_resize_size, runtime_resize_size),
                 interpolation=transforms.InterpolationMode.BICUBIC
             ),
+            transforms.CenterCrop(input_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
