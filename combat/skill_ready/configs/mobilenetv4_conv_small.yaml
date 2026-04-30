@@ -32,8 +32,8 @@ training:
 
   early_stopping:
     enabled: true
-    patience: 5
-    min_delta: 0.001
+    patience: 8
+    min_delta: 0.0003
 
 data:
   dataset_path: datasets/train
