@@ -137,6 +137,8 @@ python onnx_inference.py --config configs/mobilenetv4_conv_small.yaml --val_path
 - `epochs`: 训练轮数
 - `optimizer`: 优化器配置（类型、学习率、权重衰减）
 - `use_cuda_amp`: 启用混合精度训练
+- `lr_scheduler`: 当前支持带 warmup 的 cosine 调度，训练中会实际生效
+- `early_stopping`: 按验证集加权准确率提前停止训练
 - `loss`: 损失函数类型（'focal' 或 'CE'）
 - `loss.class_weight.enabled`: 是否按训练集文件数量自动启用类别权重；当前采用更温和的 `1/sqrt(样本数)` 方式
 

@@ -1,4 +1,5 @@
 import os
+import math
 import yaml
 import torch
 import torch.optim as optim
@@ -36,6 +37,59 @@ def build_loss_class_weights(model, loss_config, device):
         return None
 
     return model.class_weights.to(device)
+
+
+def build_lr_scheduler_state(config, optimizer):
+    scheduler_config = config['training'].get('lr_scheduler', {})
+    scheduler_type = scheduler_config.get('type')
+    if not scheduler_type:
+        return None
+
+    scheduler_type = scheduler_type.lower()
+    if scheduler_type != 'cosine':
+        raise ValueError(f"不支持的学习率调度类型: {scheduler_type}")
+
+    return {
+        'type': scheduler_type,
+        'epochs': int(config['training']['epochs']),
+        'warmup_epochs': max(0, int(scheduler_config.get('warmup_epochs', 0))),
+        'min_lr': float(scheduler_config.get('min_lr', 0.0)),
+        'base_lrs': [group['lr'] for group in optimizer.param_groups],
+    }
+
+
+def apply_epoch_learning_rate(epoch, optimizer, scheduler_state):
+    if scheduler_state is None:
+        return optimizer.param_groups[0]['lr']
+
+    total_epochs = max(1, scheduler_state['epochs'])
+    warmup_epochs = min(scheduler_state['warmup_epochs'], total_epochs)
+
+    for base_lr, param_group in zip(scheduler_state['base_lrs'], optimizer.param_groups):
+        if warmup_epochs > 0 and epoch < warmup_epochs:
+            lr = base_lr * float(epoch + 1) / warmup_epochs
+        else:
+            cosine_epochs = max(1, total_epochs - warmup_epochs)
+            progress = (epoch - warmup_epochs) / max(1, cosine_epochs - 1)
+            progress = min(max(progress, 0.0), 1.0)
+            min_lr = min(scheduler_state['min_lr'], base_lr)
+            lr = min_lr + (base_lr - min_lr) * 0.5 * (1.0 + math.cos(math.pi * progress))
+
+        param_group['lr'] = lr
+
+    return optimizer.param_groups[0]['lr']
+
+
+def build_early_stopping_state(config):
+    early_stopping_config = config['training'].get('early_stopping', {})
+    if not early_stopping_config.get('enabled', False):
+        return None
+
+    return {
+        'patience': max(1, int(early_stopping_config.get('patience', 5))),
+        'min_delta': float(early_stopping_config.get('min_delta', 0.0)),
+        'epochs_without_improvement': 0,
+    }
 
 
 def format_class_stats(class_names, values, precision=None):
@@ -168,6 +222,24 @@ def main():
         print(f"优化器初始化失败: {str(e)}")
         return
 
+    try:
+        scheduler_state = build_lr_scheduler_state(config, optimizer)
+        if scheduler_state is not None:
+            print(
+                f"启用学习率调度 | 类型: {scheduler_state['type']} | "
+                f"warmup_epochs: {scheduler_state['warmup_epochs']} | min_lr: {scheduler_state['min_lr']:.2e}"
+            )
+    except ValueError as e:
+        print(f"学习率调度配置错误: {str(e)}")
+        return
+
+    early_stopping_state = build_early_stopping_state(config)
+    if early_stopping_state is not None:
+        print(
+            f"启用 Early stopping | patience: {early_stopping_state['patience']} | "
+            f"min_delta: {early_stopping_state['min_delta']:.4f}"
+        )
+
     # 6. 初始化损失函数
     loss_config = config['training']['loss']
     loss_type = loss_config['type']
@@ -227,7 +299,8 @@ def main():
 
     for epoch in range(config['training']['epochs']):
         print()
-        print(f"Epoch {epoch+1} 开始")
+        current_lr = apply_epoch_learning_rate(epoch, optimizer, scheduler_state)
+        print(f"Epoch {epoch+1} 开始 | lr: {current_lr:.2e}")
         # 训练阶段
         model.train()  # 将模型设置为训练模式
         logger.new_epoch()  # 开始新的 epoch
@@ -281,12 +354,27 @@ def main():
 
         # 11. 保存最好的模型
         logger.finalize_epoch()
-        if logger.val_metrics['accuracy'] > best_acc:
-            best_acc = logger.val_metrics['accuracy']
+        current_val_acc = logger.val_metrics['accuracy']
+        if current_val_acc > best_acc + (early_stopping_state['min_delta'] if early_stopping_state else 0.0):
+            best_acc = current_val_acc
             torch.save(model.state_dict(), paths["checkpoint_export"])
+            if early_stopping_state is not None:
+                early_stopping_state['epochs_without_improvement'] = 0
+            print(f"保存最佳模型 | epoch: {epoch+1} | 验证集准确率: {best_acc:.4f}")
+        elif early_stopping_state is not None:
+            early_stopping_state['epochs_without_improvement'] += 1
+            print(
+                f"Early stopping 计数 | {early_stopping_state['epochs_without_improvement']}/"
+                f"{early_stopping_state['patience']} | 当前最佳: {best_acc:.4f}"
+            )
         
         # 生成报告
-        print(f"Epoch {epoch+1} 完成，验证集准确率: {logger.val_metrics['accuracy']:.4f}")
+        print(f"Epoch {epoch+1} 完成，验证集准确率: {current_val_acc:.4f}")
+
+        if early_stopping_state is not None and \
+                early_stopping_state['epochs_without_improvement'] >= early_stopping_state['patience']:
+            print(f"触发 Early stopping | 停止于 epoch {epoch+1} | 最佳验证集准确率: {best_acc:.4f}")
+            break
 
 if __name__ == "__main__":
     main()

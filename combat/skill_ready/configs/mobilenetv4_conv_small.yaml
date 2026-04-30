@@ -28,6 +28,12 @@ training:
   lr_scheduler:
     type: "cosine"
     warmup_epochs: 5
+    min_lr: 1e-6
+
+  early_stopping:
+    enabled: true
+    patience: 5
+    min_delta: 0.001
 
 data:
   dataset_path: datasets/train
