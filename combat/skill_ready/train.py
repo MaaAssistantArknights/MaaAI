@@ -18,7 +18,7 @@ from utils.path_manager import get_model_paths
 def build_confusion_cost(class_names, loss_config):
     penalty_config = loss_config.get('confusion_penalty', {})
     if not penalty_config.get('enabled', False):
-        return None, 0.0
+        return None, 0.0, None, None
 
     class_to_idx = {name: index for index, name in enumerate(class_names)}
     confusion_cost = torch.zeros(len(class_names), len(class_names), dtype=torch.float32)
@@ -28,7 +28,7 @@ def build_confusion_cost(class_names, loss_config):
     if c_index is not None and y_index is not None:
         confusion_cost[c_index, y_index] = float(penalty_config.get('c_to_y', 0.0))
 
-    return confusion_cost, float(penalty_config.get('weight', 0.0))
+    return confusion_cost, float(penalty_config.get('weight', 0.0)), c_index, y_index
 
 
 def build_loss_class_weights(model, loss_config, device):
@@ -248,7 +248,7 @@ def main():
     # 6. 初始化损失函数
     loss_config = config['training']['loss']
     loss_type = loss_config['type']
-    confusion_cost, confusion_weight = build_confusion_cost(model.class_names, loss_config)
+    confusion_cost, confusion_weight, c_index, y_index = build_confusion_cost(model.class_names, loss_config)
     class_weights = build_loss_class_weights(model, loss_config, device)
 
     print(f"训练集类别计数 | {format_class_stats(model.class_names, model.class_counts.tolist())}")
@@ -261,8 +261,11 @@ def main():
     else:
         print("未启用自动类别权重")
 
-    if confusion_cost is not None and confusion_weight > 0:
-        print(f"启用非对称误判惩罚 | c->y 额外权重: {confusion_cost[0, 2].item():.2f} | 损失系数: {confusion_weight:.2f}")
+    if confusion_cost is not None and confusion_weight > 0 and c_index is not None and y_index is not None:
+        print(
+            f"启用非对称误判惩罚 | c->y 额外权重: {confusion_cost[c_index, y_index].item():.2f} | "
+            f"损失系数: {confusion_weight:.2f}"
+        )
 
     # 如果特指使用FocalLoss，其余情况一律使用CrossEntropyLoss
     if loss_type == 'focal':
