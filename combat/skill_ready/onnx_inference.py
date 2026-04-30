@@ -1,10 +1,11 @@
 import os
+import shutil
 import yaml
 import torch
 import time
 import numpy as np
 import argparse
-from core.data_loader import SkillIconDataset
+from core.data_loader import SkillIconDataset, get_dataset_class_counts, get_dataset_class_weights
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.utils.data import DataLoader
@@ -13,12 +14,29 @@ import onnxruntime as ort
 from torchvision.utils import save_image
 from utils.img_process import unnormalize
 
+
+def build_hard_example_path(hard_example_root, true_class_name, pred_class_name, image_path):
+    target_dir = os.path.join(hard_example_root, f"{true_class_name}_err")
+    os.makedirs(target_dir, exist_ok=True)
+
+    stem, ext = os.path.splitext(os.path.basename(image_path))
+    base_name = f"{stem}__pred_{pred_class_name}"
+    candidate_path = os.path.join(target_dir, f"{base_name}{ext}")
+    suffix = 1
+
+    while os.path.exists(candidate_path):
+        candidate_path = os.path.join(target_dir, f"{base_name}_{suffix}{ext}")
+        suffix += 1
+
+    return candidate_path
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Validate ONNX format model weights')
     parser.add_argument('--config', help='指定模型配置文件',
                         default='configs/mobilenetv4_conv_small.yaml', type=str, required=True)
     parser.add_argument('--weights', help='指定onnx路径', type=str)
     parser.add_argument('--val_path', help='指定验证集路径', default='datasets/val', type=str)
+    parser.add_argument('--hard_example_dir', help='将误判图片按真实类别导出到训练目录，如 datasets/train', type=str)
     args = parser.parse_args()
     return args
 
@@ -57,7 +75,17 @@ def main():
             num_workers=4,
             pin_memory=True
         )
+        val_class_counts = get_dataset_class_counts(val_dataset, len(model_wrapper.class_names))
+        val_class_weights = get_dataset_class_weights(val_dataset, len(model_wrapper.class_names))
         print(f"数据加载器统计 | 指定验证集路径: {args.val_path} | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
+        print(
+            f"验证集类别计数 | "
+            f"{' | '.join(f'{name}: {int(count)}' for name, count in zip(model_wrapper.class_names, val_class_counts.tolist()))}"
+        )
+        print(
+            f"验证集评估权重 | "
+            f"{' | '.join(f'{name}: {weight:.4f}' for name, weight in zip(model_wrapper.class_names, val_class_weights.tolist()))}"
+        )
     except KeyError as e:
         print(f"数据加载配置错误: {str(e)}")
         return
@@ -80,7 +108,7 @@ def main():
         log_dir=os.path.join("onnx_val"),
         class_names=['c', 'n', 'y'],
         model_name=config['model']['name'],
-        class_weights=None
+        class_weights=val_class_weights
     )
 
     # 6. 推理性能测试
@@ -126,6 +154,7 @@ def main():
     print("\n开始完整验证...")
     logger.new_epoch()
     total_samples = 0
+    hard_example_count = 0
 
     # 创建保存错误图片的 debug 目录
     debug_base_dir = os.path.join("debug", f"debug_{config['model']['name']}_{time.strftime('%Y%m%d_%H%M%S')}")
@@ -179,7 +208,19 @@ def main():
                             save_image(unnormalize(images[i].cpu(), device), save_path)
                             print(f"保存错误分类图片: {save_path}")
 
+                            if args.hard_example_dir:
+                                target_path = build_hard_example_path(
+                                    args.hard_example_dir,
+                                    logger.class_names[true_class],
+                                    logger.class_names[pred_class],
+                                    image_path
+                                )
+                                shutil.copy2(image_path, target_path)
+                                hard_example_count += 1
+
         print(f"已验证样本总数: {total_samples}")
+        if args.hard_example_dir:
+            print(f"已导出难例样本数: {hard_example_count} -> {args.hard_example_dir}")
     except RuntimeError as e:
         print(f"验证过程异常: {str(e)}")
         return

@@ -138,3 +138,5 @@ output
 fonts
 pretrained_model
 
+/.vs
+/.vscode

@@ -5,10 +5,12 @@ import torch
 from core.model_builder import create_model
 from utils.path_manager import get_model_paths
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Export model to ONNX format')
     parser.add_argument('--config', help='指定模型配置文件',
                         default='configs/mobilenetv4_conv_small.yaml', type=str)
+    parser.add_argument('--weights', help='指定导出时加载的 pth 权重路径；默认使用最佳检查点', type=str)
     args = parser.parse_args()
     return args
 
@@ -33,7 +35,7 @@ def main():
     # 4. 初始化模型
     try:
         model = create_model(config).to(device)
-        checkpoint_path = paths['checkpoint_export']
+        checkpoint_path = args.weights or paths['checkpoint_export']
         
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"检查点文件 {checkpoint_path} 不存在")
@@ -41,7 +43,7 @@ def main():
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
         model.eval()
         print(f"已加载最佳模型权重: {checkpoint_path}")
-    except RuntimeError as e:
+    except (RuntimeError, FileNotFoundError) as e:
         print(f"模型加载失败: {str(e)}")
         return
 

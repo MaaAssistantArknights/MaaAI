@@ -12,7 +12,9 @@ class MetricLogger:
         self.class_names = class_names
         self.model_size = None
         self.flops = None
-        self.class_weights = class_weights
+        if class_weights is not None and hasattr(class_weights, 'detach'):
+            class_weights = class_weights.detach().cpu().numpy()
+        self.class_weights = None if class_weights is None else np.asarray(class_weights, dtype=np.float32)
         self.val_metrics = {'loss': [], 'outputs': [], 'labels': [], 'accuracy': 0.0}
         self.epoch = 0  # 添加 epoch 属性
         self.reset()
@@ -40,8 +42,9 @@ class MetricLogger:
         preds = np.argmax(outputs, axis=1)
 
         # 基础指标
-        if self.class_weights is not None:
-            accuracy = np.average(preds == labels, weights=self.class_weights)
+        if phase == 'val' and self.class_weights is not None:
+            sample_weights = self.class_weights[labels.astype(np.int64)]
+            accuracy = np.average(preds == labels, weights=sample_weights)
         else:
             accuracy = np.mean(preds == labels)
         loss = np.mean(self.__dict__[f'{phase}_metrics']['loss'])

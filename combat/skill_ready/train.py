@@ -6,17 +6,90 @@ import argparse
 
 from torch import nn
 
-from utils.loss import FocalLoss
-from core.data_loader import create_loaders
+from utils.loss import CostSensitiveCrossEntropyLoss, FocalLoss
+from core.data_loader import create_loaders, get_dataset_class_counts, get_dataset_class_weights
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.amp import autocast, GradScaler
 from utils.path_manager import get_model_paths
 
+
+def build_confusion_cost(class_names, loss_config):
+    penalty_config = loss_config.get('confusion_penalty', {})
+    if not penalty_config.get('enabled', False):
+        return None, 0.0
+
+    class_to_idx = {name: index for index, name in enumerate(class_names)}
+    confusion_cost = torch.zeros(len(class_names), len(class_names), dtype=torch.float32)
+
+    c_index = class_to_idx.get('c')
+    y_index = class_to_idx.get('y')
+    if c_index is not None and y_index is not None:
+        confusion_cost[c_index, y_index] = float(penalty_config.get('c_to_y', 0.0))
+
+    return confusion_cost, float(penalty_config.get('weight', 0.0))
+
+
+def build_loss_class_weights(model, loss_config, device):
+    class_weight_config = loss_config.get('class_weight', {})
+    if not class_weight_config.get('enabled', True):
+        return None
+
+    return model.class_weights.to(device)
+
+
+def format_class_stats(class_names, values, precision=None):
+    parts = []
+    for name, value in zip(class_names, values):
+        if precision is None:
+            parts.append(f"{name}: {int(value)}")
+        else:
+            parts.append(f"{name}: {value:.{precision}f}")
+    return ' | '.join(parts)
+
+
+def evaluate_accuracy(model, data_loader, device, use_cuda_amp=False, class_weights=None):
+    was_training = model.training
+    model.eval()
+    total_correct = 0
+    total_samples = 0
+    predictions_list = []
+    labels_list = []
+
+    with torch.no_grad():
+        for images, labels in data_loader:
+            images, labels = images.to(device), labels.to(device)
+            if use_cuda_amp and device.type == 'cuda':
+                with autocast('cuda'):
+                    outputs = model(images)
+            else:
+                outputs = model(images)
+
+            predictions = outputs.argmax(dim=1)
+            total_correct += (predictions == labels).sum().item()
+            total_samples += labels.size(0)
+            if class_weights is not None:
+                predictions_list.append(predictions.detach().cpu())
+                labels_list.append(labels.detach().cpu())
+
+    if was_training:
+        model.train()
+
+    if total_samples == 0:
+        return 0.0
+    if class_weights is not None:
+        predictions = torch.cat(predictions_list)
+        labels = torch.cat(labels_list)
+        weights = class_weights.detach().cpu()[labels]
+        weighted_correct = weights * (predictions == labels).float()
+        return (weighted_correct.sum() / weights.sum().clamp_min(1e-12)).item()
+    return total_correct / total_samples
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train model scripts')
     parser.add_argument('--config', help='Specify model configuration file',
                         default='configs/mobilenetv4_conv_small.yaml', type=str, required=True)
+    parser.add_argument('--weights', help='Specify pth path for fine-tuning start point', type=str)
     args = parser.parse_args()
     return args
 
@@ -33,6 +106,10 @@ def main():
         print(f"错误：配置文件 {args.config} 不存在")
         return
 
+    if args.weights:
+        config['model']['pretrained'] = False
+        print(f"微调模式 | 起始权重: {args.weights}")
+
     # 2. 初始化训练设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
@@ -47,14 +124,26 @@ def main():
             train_transform=model_wrapper.train_transform,
             val_transform=model_wrapper.val_transform
         )
-        print("数据加载器创建完成")
+        val_class_counts = get_dataset_class_counts(val_loader.dataset, len(model_wrapper.class_names))
+        val_class_weights = get_dataset_class_weights(val_loader.dataset, len(model_wrapper.class_names))
+        print(
+            f"数据加载器创建完成 | 训练样本数: {len(train_loader.dataset)} | 验证样本数: {len(val_loader.dataset)} | "
+            f"训练采样器: {type(train_loader.sampler).__name__}"
+        )
+        print(f"验证集类别计数 | {format_class_stats(model_wrapper.class_names, val_class_counts.tolist())}")
+        print(f"验证集评估权重 | {format_class_stats(model_wrapper.class_names, val_class_weights.tolist(), precision=4)}")
     except KeyError as e:
         print(f"数据加载配置错误: {str(e)}")
         return
     
     # 4. 初始化模型
     try:
-        model = create_model(config).to(device)
+        model = model_wrapper.to(device)
+        if args.weights:
+            if not os.path.exists(args.weights):
+                raise FileNotFoundError(f"微调权重文件 {args.weights} 不存在")
+            model.load_state_dict(torch.load(args.weights, map_location=device))
+            print(f"已加载微调起点权重: {args.weights}")
         print("模型初始化成功")
     except Exception as e:
         print(f"模型初始化失败: {str(e)}")
@@ -80,12 +169,37 @@ def main():
         return
 
     # 6. 初始化损失函数
-    loss_type = config['training']['loss']['type']
+    loss_config = config['training']['loss']
+    loss_type = loss_config['type']
+    confusion_cost, confusion_weight = build_confusion_cost(model.class_names, loss_config)
+    class_weights = build_loss_class_weights(model, loss_config, device)
+
+    print(f"训练集类别计数 | {format_class_stats(model.class_names, model.class_counts.tolist())}")
+
+    if class_weights is not None:
+        print(
+            f"启用自动类别权重 | "
+            f"{format_class_stats(model.class_names, class_weights.detach().cpu().tolist(), precision=4)}"
+        )
+    else:
+        print("未启用自动类别权重")
+
+    if confusion_cost is not None and confusion_weight > 0:
+        print(f"启用非对称误判惩罚 | c->y 额外权重: {confusion_cost[0, 2].item():.2f} | 损失系数: {confusion_weight:.2f}")
+
     # 如果特指使用FocalLoss，其余情况一律使用CrossEntropyLoss
     if loss_type == 'focal':
-        criterion = FocalLoss().to(device)
+        criterion = FocalLoss(
+            weight=class_weights,
+            confusion_cost=confusion_cost,
+            confusion_weight=confusion_weight
+        ).to(device)
     else:
-        criterion = nn.CrossEntropyLoss(weight=None).to(device)
+        criterion = CostSensitiveCrossEntropyLoss(
+            weight=class_weights,
+            confusion_cost=confusion_cost,
+            confusion_weight=confusion_weight
+        ).to(device)
 
     # 7. 混合精度训练
     try:
@@ -102,11 +216,15 @@ def main():
         log_dir="train",  # Specify log directory
         class_names=['c', 'n', 'y'],  # Specify class names
         model_name=config['model']['name'], # Specify model name
-        class_weights=None # class_weights.cpu().numpy() if torch.cuda.is_available() else class_weights.numpy()
+        class_weights=val_class_weights
     )
 
     # 9. 训练
     best_acc = 0.0
+    if args.weights:
+        best_acc = evaluate_accuracy(model, val_loader, device, use_cuda_amp, val_class_weights)
+        print(f"微调起点验证集准确率: {best_acc:.4f}")
+
     for epoch in range(config['training']['epochs']):
         print()
         print(f"Epoch {epoch+1} 开始")
