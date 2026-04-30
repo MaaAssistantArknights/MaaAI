@@ -1,9 +1,34 @@
 import os
+import cv2
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import transforms
 from abc import ABC, abstractmethod
 from core.data_loader import get_class_counts
+
+
+class MaaRuntimeValTransform:
+    def __init__(self, input_size, resize_size, mean, std):
+        self.input_size = int(input_size)
+        self.resize_size = int(resize_size)
+        self.mean = torch.tensor(mean, dtype=torch.float32).view(3, 1, 1)
+        self.std = torch.tensor(std, dtype=torch.float32).view(3, 1, 1)
+
+    def __call__(self, image):
+        image_array = np.asarray(image, dtype=np.uint8)
+        resized = cv2.resize(
+            image_array,
+            (self.resize_size, self.resize_size),
+            interpolation=cv2.INTER_CUBIC
+        )
+
+        crop_start = max(0, (self.resize_size - self.input_size) // 2)
+        crop_end = crop_start + self.input_size
+        cropped = resized[crop_start:crop_end, crop_start:crop_end]
+
+        tensor = torch.from_numpy(cropped).permute(2, 0, 1).float().div(255.0)
+        return (tensor - self.mean) / self.std
 
 class BaseModel(ABC, nn.Module):
     def __init__(self, config):
@@ -69,14 +94,10 @@ class BaseModel(ABC, nn.Module):
                                  std=[0.229, 0.224, 0.225])
         ])
 
-        # 与 Maa 实跑对齐：先放大到 72，再中心裁到 64。
-        self.val_transform = transforms.Compose([
-            transforms.Resize(
-                (runtime_resize_size, runtime_resize_size),
-                interpolation=transforms.InterpolationMode.BICUBIC
-            ),
-            transforms.CenterCrop(input_size),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-        ])
+        # 与 Maa 实跑对齐：使用 OpenCV INTER_CUBIC 先放大到 72，再中心裁到 64。
+        self.val_transform = MaaRuntimeValTransform(
+            input_size=input_size,
+            resize_size=runtime_resize_size,
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )

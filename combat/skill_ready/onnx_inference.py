@@ -179,9 +179,9 @@ def main():
                 
                 # ONNX 推理
                 input_name = ort_session.get_inputs()[0].name
-                outputs = ort_session.run(None, {input_name: images.to(torch.device('cpu')).numpy()})[0]
-                outputs = torch.from_numpy(outputs).to(device)
-                outputs = torch.softmax(outputs, dim=1)
+                raw_outputs = ort_session.run(None, {input_name: images.to(torch.device('cpu')).numpy()})[0]
+                raw_outputs = torch.from_numpy(raw_outputs).to(device)
+                outputs = torch.softmax(raw_outputs, dim=1)
                 
                 logger.log_val(0, outputs, labels)
                 total_samples += labels.size(0)
@@ -191,7 +191,7 @@ def main():
 
                 # 输出结果到文件
                 if output_file:
-                    probs = torch.softmax(outputs, dim=1)
+                    probs = outputs
                     for i in range(images.size(0)):
                         index = batch_idx * val_batchsize + i
                         image_path = val_loader.dataset.samples[index][0]
@@ -213,7 +213,11 @@ def main():
                             filename = os.path.basename(image_path)
                             save_path = os.path.join(label_dir, filename)
                             save_image(unnormalize(images[i].cpu(), device), save_path)
-                            print(f"保存错误分类图片: {save_path}")
+                            score_text = ' | '.join(
+                                f"{class_name}: {score:.6f}"
+                                for class_name, score in zip(logger.class_names, class_probs)
+                            )
+                            print(f"保存错误分类图片: {save_path} | {score_text}")
 
                             if args.hard_example_dir:
                                 target_path = build_hard_example_path(
