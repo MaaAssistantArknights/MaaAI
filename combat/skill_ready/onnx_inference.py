@@ -15,6 +15,15 @@ from torchvision.utils import save_image
 from utils.img_process import unnormalize
 
 
+GPU_PROVIDER_PRIORITY = (
+    'CUDAExecutionProvider',
+    'DmlExecutionProvider',
+    'CoreMLExecutionProvider',
+    'ROCMExecutionProvider',
+    'TensorrtExecutionProvider',
+)
+
+
 def build_hard_example_path(hard_example_root, true_class_name, pred_class_name, image_path):
     target_dir = os.path.join(hard_example_root, f"{true_class_name}_err")
     os.makedirs(target_dir, exist_ok=True)
@@ -37,8 +46,22 @@ def parse_args():
     parser.add_argument('--weights', help='指定onnx路径', type=str)
     parser.add_argument('--val_path', help='指定验证集路径', default='datasets/val', type=str)
     parser.add_argument('--hard_example_dir', help='将误判图片按真实类别导出到训练目录，如 datasets/train', type=str)
+    parser.add_argument('--use_gpu', help='优先使用可用的 GPU Execution Provider 进行 ONNX 推理', action='store_true')
     args = parser.parse_args()
     return args
+
+
+def resolve_onnx_providers(use_gpu):
+    if not use_gpu:
+        return ['CPUExecutionProvider']
+
+    available_providers = ort.get_available_providers()
+    for provider_name in GPU_PROVIDER_PRIORITY:
+        if provider_name in available_providers:
+            return [provider_name, 'CPUExecutionProvider']
+
+    available_text = ', '.join(available_providers) if available_providers else '无'
+    raise RuntimeError(f"未找到可用的 GPU Execution Provider，可用 Providers: {available_text}")
 
 def main():
     args = parse_args()
@@ -52,9 +75,14 @@ def main():
         print(f"错误：配置文件 {args.config} 不存在")
         return
 
-    # 2. 初始化设备
-    device = torch.device('cpu')
-    print(f"使用设备: {device}")
+    # 2. 确认 ONNX Runtime provider 选择
+    available_providers = ort.get_available_providers()
+    provider_mode = 'GPU优先' if args.use_gpu else 'CPU'
+    available_provider_text = ', '.join(available_providers) if available_providers else '无'
+    providers = resolve_onnx_providers(args.use_gpu)
+    tensor_device = torch.device('cpu')
+    print(f"ONNX Runtime 请求模式: {provider_mode} | 当前可用 Providers: {available_provider_text}")
+    print(f"ONNX Runtime 计划使用 Providers: {', '.join(providers)}")
     val_batchsize = int(config['training']['batch_size']) * 2  # 检测2遍，有1次错就当错
     # 获取路径
     paths = get_model_paths(config)
@@ -97,13 +125,12 @@ def main():
 
     # 4. 初始化 ONNX 模型
     try:
-        if not args.weights:
-            onnx_path = paths['onnx_export']
+        onnx_path = args.weights or paths['onnx_export']
         if not os.path.exists(onnx_path):
             raise FileNotFoundError(f"ONNX 模型文件 {onnx_path} 不存在")
-        
-        ort_session = ort.InferenceSession(onnx_path)
-        print(f"ONNX 模型加载完成: {onnx_path}")
+
+        ort_session = ort.InferenceSession(onnx_path, providers=providers)
+        print(f"ONNX 模型加载完成: {onnx_path} | Execution Providers: {', '.join(ort_session.get_providers())}")
     except Exception as e:
         print(f"ONNX 模型加载失败: {str(e)}")
         return
@@ -175,12 +202,12 @@ def main():
     try:
         with torch.no_grad():
             for batch_idx, (images, labels) in enumerate(val_loader):
-                images, labels = images.to(device), labels.to(device)
+                images, labels = images.to(tensor_device), labels.to(tensor_device)
                 
                 # ONNX 推理
                 input_name = ort_session.get_inputs()[0].name
                 raw_outputs = ort_session.run(None, {input_name: images.to(torch.device('cpu')).numpy()})[0]
-                raw_outputs = torch.from_numpy(raw_outputs).to(device)
+                raw_outputs = torch.from_numpy(raw_outputs).to(tensor_device)
                 outputs = torch.softmax(raw_outputs, dim=1)
                 
                 logger.log_val(0, outputs, labels)
@@ -212,7 +239,7 @@ def main():
                             # 从原始图片路径提取文件名
                             filename = os.path.basename(image_path)
                             save_path = os.path.join(label_dir, filename)
-                            save_image(unnormalize(images[i].cpu(), device), save_path)
+                            save_image(unnormalize(images[i].cpu(), tensor_device), save_path)
                             score_text = ' | '.join(
                                 f"{class_name}: {score:.6f}"
                                 for class_name, score in zip(logger.class_names, class_probs)

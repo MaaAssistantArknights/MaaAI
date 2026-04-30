@@ -118,6 +118,9 @@ python export.py --config configs/mobilenetv4_conv_small.yaml --weights checkpoi
 # ONNX模型验证和性能测试
 python onnx_inference.py --config configs/mobilenetv4_conv_small.yaml --val_path datasets/val
 
+# 优先使用可用的 GPU Execution Provider 进行 ONNX 验证
+python onnx_inference.py --config configs/mobilenetv4_conv_small.yaml --val_path datasets/val --use_gpu
+
 # 导出误判样本到训练集的 *_err 目录
 python onnx_inference.py --config configs/mobilenetv4_conv_small.yaml --val_path datasets/val --hard_example_dir datasets/train
 ```
