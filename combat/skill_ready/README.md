@@ -89,7 +89,7 @@ python train.py --config configs/mobilenetv4_conv_small.yaml --weights checkpoin
 
 ### 4. 模型验证
 
-验证阶段的 `Accuracy` 会按验证集自身的类别数量做直接反比加权，也就是少样本类权重更高；这里使用的是验证集原始比例，不使用训练阶段的 `1/sqrt(样本数)` 权重。
+验证阶段的 `Accuracy` 会按验证集自身的类别数量做直接反比加权；如果样本来自 `*_err` 目录，还会额外乘上与训练相同的 `training.sampler.err_folder_weight`。
 
 ```bash
 # PyTorch模型验证
@@ -164,7 +164,10 @@ python onnx_inference.py --config configs/mobilenetv4_conv_small.yaml --val_path
 ### 训练输出
 - **检查点**: 保存在 `checkpoints/{model_name}/`
 - **日志**: TensorBoard日志保存在 `logs/train/{model_name}/`
+- **图形化报告**: 训练曲线、混淆矩阵、每类 Precision/Recall/F1 柱状图保存在对应日志目录
 - **最佳模型**: `skill_ready_cls.pth`
+
+训练、验证、ONNX 验证结束后，控制台会直接打印报告目录以及 `classification_report.txt`、`val_confusion_matrix.png`、`val_classification_metrics.png` 等文件路径。
 
 ### ONNX输出
 - **ONNX模型**: `onnx/{model_name}/skill_ready_cls.onnx`

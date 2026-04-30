@@ -8,7 +8,7 @@ import argparse
 from torch import nn
 
 from utils.loss import CostSensitiveCrossEntropyLoss, FocalLoss
-from core.data_loader import create_loaders, get_dataset_class_counts, get_dataset_class_weights
+from core.data_loader import create_loaders, get_dataset_class_counts, get_dataset_class_weights, get_dataset_sample_weights
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.amp import autocast, GradScaler
@@ -102,7 +102,7 @@ def format_class_stats(class_names, values, precision=None):
     return ' | '.join(parts)
 
 
-def evaluate_accuracy(model, data_loader, device, use_cuda_amp=False, class_weights=None):
+def evaluate_accuracy(model, data_loader, device, use_cuda_amp=False, sample_weights=None):
     was_training = model.training
     model.eval()
     total_correct = 0
@@ -122,7 +122,7 @@ def evaluate_accuracy(model, data_loader, device, use_cuda_amp=False, class_weig
             predictions = outputs.argmax(dim=1)
             total_correct += (predictions == labels).sum().item()
             total_samples += labels.size(0)
-            if class_weights is not None:
+            if sample_weights is not None:
                 predictions_list.append(predictions.detach().cpu())
                 labels_list.append(labels.detach().cpu())
 
@@ -131,10 +131,10 @@ def evaluate_accuracy(model, data_loader, device, use_cuda_amp=False, class_weig
 
     if total_samples == 0:
         return 0.0
-    if class_weights is not None:
+    if sample_weights is not None:
         predictions = torch.cat(predictions_list)
         labels = torch.cat(labels_list)
-        weights = class_weights.detach().cpu()[labels]
+        weights = sample_weights.detach().cpu()
         weighted_correct = weights * (predictions == labels).float()
         return (weighted_correct.sum() / weights.sum().clamp_min(1e-12)).item()
     return total_correct / total_samples
@@ -178,14 +178,21 @@ def main():
             train_transform=model_wrapper.train_transform,
             val_transform=model_wrapper.val_transform
         )
+        err_folder_weight = float(config['training'].get('sampler', {}).get('err_folder_weight', 1.0))
         val_class_counts = get_dataset_class_counts(val_loader.dataset, len(model_wrapper.class_names))
         val_class_weights = get_dataset_class_weights(val_loader.dataset, len(model_wrapper.class_names))
+        val_sample_weights = get_dataset_sample_weights(
+            val_loader.dataset,
+            len(model_wrapper.class_names),
+            err_folder_weight=err_folder_weight
+        )
         print(
             f"数据加载器创建完成 | 训练样本数: {len(train_loader.dataset)} | 验证样本数: {len(val_loader.dataset)} | "
             f"训练采样器: {type(train_loader.sampler).__name__}"
         )
         print(f"验证集类别计数 | {format_class_stats(model_wrapper.class_names, val_class_counts.tolist())}")
         print(f"验证集评估权重 | {format_class_stats(model_wrapper.class_names, val_class_weights.tolist(), precision=4)}")
+        print(f"验证集难例加权系数 | _err: {err_folder_weight:.2f}")
     except KeyError as e:
         print(f"数据加载配置错误: {str(e)}")
         return
@@ -288,13 +295,15 @@ def main():
         log_dir="train",  # Specify log directory
         class_names=['c', 'n', 'y'],  # Specify class names
         model_name=config['model']['name'], # Specify model name
-        class_weights=val_class_weights
+        class_weights=val_class_weights,
+        val_sample_weights=val_sample_weights
     )
+    print(f"训练报告目录: {logger.log_dir}")
 
     # 9. 训练
     best_acc = 0.0
     if args.weights:
-        best_acc = evaluate_accuracy(model, val_loader, device, use_cuda_amp, val_class_weights)
+        best_acc = evaluate_accuracy(model, val_loader, device, use_cuda_amp, val_sample_weights)
         print(f"微调起点验证集准确率: {best_acc:.4f}")
 
     for epoch in range(config['training']['epochs']):
@@ -375,6 +384,13 @@ def main():
                 early_stopping_state['epochs_without_improvement'] >= early_stopping_state['patience']:
             print(f"触发 Early stopping | 停止于 epoch {epoch+1} | 最佳验证集准确率: {best_acc:.4f}")
             break
+
+    report_paths = logger.get_report_paths()
+    print(f"分类报告: {report_paths['classification_report']}")
+    print(f"混淆矩阵: {report_paths['confusion_matrix']}")
+    print(f"分类指标图: {report_paths['classification_metrics']}")
+    print(f"训练曲线图: {report_paths['training_curves']}")
+    logger.writer.close()
 
 if __name__ == "__main__":
     main()

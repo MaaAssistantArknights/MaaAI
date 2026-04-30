@@ -130,6 +130,19 @@ def _extract_hard_case_flags(dataset):
     return dataset.sample_is_hard_case
 
 
+def get_dataset_sample_weights(dataset, num_classes, err_folder_weight=1.0):
+    labels = torch.tensor(_extract_labels(dataset), dtype=torch.long)
+    class_weights = get_dataset_class_weights(dataset, num_classes)
+    sample_weights = class_weights[labels]
+
+    hard_case_flags = torch.tensor(_extract_hard_case_flags(dataset), dtype=torch.bool)
+    if err_folder_weight > 1.0:
+        sample_weights = sample_weights.clone()
+        sample_weights[hard_case_flags] *= float(err_folder_weight)
+
+    return sample_weights
+
+
 def _build_weighted_sampler(dataset, err_folder_weight=1.0):
     labels = torch.tensor(_extract_labels(dataset), dtype=torch.long)
     class_counts = torch.bincount(labels).float().clamp_min(1.0)

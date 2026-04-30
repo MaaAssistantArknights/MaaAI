@@ -5,7 +5,7 @@ import torch
 import time
 import numpy as np
 import argparse
-from core.data_loader import SkillIconDataset, get_dataset_class_counts, get_dataset_class_weights
+from core.data_loader import SkillIconDataset, get_dataset_class_counts, get_dataset_class_weights, get_dataset_sample_weights
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.utils.data import DataLoader
@@ -75,8 +75,14 @@ def main():
             num_workers=4,
             pin_memory=True
         )
+        err_folder_weight = float(config['training'].get('sampler', {}).get('err_folder_weight', 1.0))
         val_class_counts = get_dataset_class_counts(val_dataset, len(model_wrapper.class_names))
         val_class_weights = get_dataset_class_weights(val_dataset, len(model_wrapper.class_names))
+        val_sample_weights = get_dataset_sample_weights(
+            val_dataset,
+            len(model_wrapper.class_names),
+            err_folder_weight=err_folder_weight
+        )
         print(f"数据加载器统计 | 指定验证集路径: {args.val_path} | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
         print(
             f"验证集类别计数 | "
@@ -86,6 +92,7 @@ def main():
             f"验证集评估权重 | "
             f"{' | '.join(f'{name}: {weight:.4f}' for name, weight in zip(model_wrapper.class_names, val_class_weights.tolist()))}"
         )
+        print(f"验证集难例加权系数 | _err: {err_folder_weight:.2f}")
     except KeyError as e:
         print(f"数据加载配置错误: {str(e)}")
         return
@@ -108,8 +115,10 @@ def main():
         log_dir=os.path.join("onnx_val"),
         class_names=['c', 'n', 'y'],
         model_name=config['model']['name'],
-        class_weights=val_class_weights
+        class_weights=val_class_weights,
+        val_sample_weights=val_sample_weights
     )
+    print(f"验证报告目录: {logger.log_dir}")
 
     # 6. 推理性能测试
     try:
@@ -235,6 +244,11 @@ def main():
         print(f"\n验证结果 | 准确率: {logger.val_metrics['accuracy']:.2%}")
     else:
         print("未计算验证指标，请检查数据记录")
+    report_paths = logger.get_report_paths()
+    print(f"分类报告: {report_paths['classification_report']}")
+    print(f"混淆矩阵: {report_paths['confusion_matrix']}")
+    print(f"分类指标图: {report_paths['classification_metrics']}")
+    logger.writer.close()
 
 if __name__ == "__main__":
     main()
