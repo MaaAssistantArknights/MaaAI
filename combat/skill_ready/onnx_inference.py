@@ -75,13 +75,11 @@ def main():
             num_workers=4,
             pin_memory=True
         )
-        err_folder_weight = float(config['training'].get('sampler', {}).get('err_folder_weight', 1.0))
         val_class_counts = get_dataset_class_counts(val_dataset, len(model_wrapper.class_names))
         val_class_weights = get_dataset_class_weights(val_dataset, len(model_wrapper.class_names))
         val_sample_weights = get_dataset_sample_weights(
             val_dataset,
-            len(model_wrapper.class_names),
-            err_folder_weight=err_folder_weight
+            len(model_wrapper.class_names)
         )
         print(f"数据加载器统计 | 指定验证集路径: {args.val_path} | 验证集样本: {len(val_loader.dataset)} | 批次: {len(val_loader)}")
         print(
@@ -92,7 +90,7 @@ def main():
             f"验证集评估权重 | "
             f"{' | '.join(f'{name}: {weight:.4f}' for name, weight in zip(model_wrapper.class_names, val_class_weights.tolist()))}"
         )
-        print(f"验证集难例加权系数 | _err: {err_folder_weight:.2f}")
+        print("验证集评估策略 | 仅按类别数量加权，不对 _err 额外加权")
     except KeyError as e:
         print(f"数据加载配置错误: {str(e)}")
         return

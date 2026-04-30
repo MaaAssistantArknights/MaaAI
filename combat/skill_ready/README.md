@@ -89,7 +89,7 @@ python train.py --config configs/mobilenetv4_conv_small.yaml --weights checkpoin
 
 ### 4. 模型验证
 
-验证阶段的 `Accuracy` 会按验证集自身的类别数量做直接反比加权；如果样本来自 `*_err` 目录，还会额外乘上与训练相同的 `training.sampler.err_folder_weight`。
+验证阶段的 `Accuracy` 会按验证集自身的类别数量做直接反比加权，不会因为样本来自 `*_err` 目录而额外提高权重。
 
 ```bash
 # PyTorch模型验证
