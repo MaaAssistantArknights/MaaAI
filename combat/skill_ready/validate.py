@@ -1,13 +1,30 @@
 import os
+import shutil
 import yaml
 import torch
 import time
 import argparse
-from core.data_loader import SkillIconDataset
+from core.data_loader import SkillIconDataset, get_dataset_class_counts, get_dataset_class_weights, get_dataset_sample_weights
 from core.model_builder import create_model
 from utils.logger import MetricLogger
 from torch.utils.data import DataLoader
 from utils.path_manager import get_model_paths
+
+
+def build_hard_example_path(hard_example_root, true_class_name, pred_class_name, image_path):
+    target_dir = os.path.join(hard_example_root, f"{true_class_name}_err")
+    os.makedirs(target_dir, exist_ok=True)
+
+    stem, ext = os.path.splitext(os.path.basename(image_path))
+    base_name = f"{stem}__pred_{pred_class_name}"
+    candidate_path = os.path.join(target_dir, f"{base_name}{ext}")
+    suffix = 1
+
+    while os.path.exists(candidate_path):
+        candidate_path = os.path.join(target_dir, f"{base_name}_{suffix}{ext}")
+        suffix += 1
+
+    return candidate_path
 
 
 def parse_args():
@@ -16,6 +33,7 @@ def parse_args():
                         default='configs/mobilenetv4_conv_small.yaml', type=str, required=True)
     parser.add_argument('--weights', help='Specify pth path', type=str)
     parser.add_argument('--val_path', help='Specify validation set path', default='datasets/val', type=str)
+    parser.add_argument('--hard_example_dir', help='将误判图片按真实类别导出到训练目录，如 datasets/train', type=str)
     args = parser.parse_args()
     return args
 
@@ -55,8 +73,23 @@ def main():
             num_workers=4,
             pin_memory=True
         )
+        val_class_counts = get_dataset_class_counts(val_dataset, len(model_wrapper.class_names))
+        val_class_weights = get_dataset_class_weights(val_dataset, len(model_wrapper.class_names))
+        val_sample_weights = get_dataset_sample_weights(
+            val_dataset,
+            len(model_wrapper.class_names)
+        )
         print(
             f"Data loader统计 | 指定验证集路径: {args.val_path} | 验证样本数: {len(val_loader.dataset)} | 批次数: {len(val_loader)}")
+        print(
+            f"验证集类别计数 | "
+            f"{' | '.join(f'{name}: {int(count)}' for name, count in zip(model_wrapper.class_names, val_class_counts.tolist()))}"
+        )
+        print(
+            f"验证集评估权重 | "
+            f"{' | '.join(f'{name}: {weight:.4f}' for name, weight in zip(model_wrapper.class_names, val_class_weights.tolist()))}"
+        )
+        print("验证集评估策略 | 仅按类别数量加权，不对 _err 额外加权")
     except KeyError as e:
         print(f"Data loading配置错误: {str(e)}")
         return
@@ -82,8 +115,10 @@ def main():
         log_dir=os.path.join("pytorch_val"),
         class_names=['c', 'n', 'y'],
         model_name=config['model']['name'],
-        class_weights=None
+        class_weights=val_class_weights,
+        val_sample_weights=val_sample_weights
     )
+    print(f"验证报告目录: {logger.log_dir}")
 
     # 6. 推理性能测试（修复尺寸问题）
     try:
@@ -125,6 +160,7 @@ def main():
     print("\n开始完整验证...")
     logger.new_epoch()
     total_samples = 0
+    hard_example_count = 0
 
     # 输出文件路径
     output_file = None
@@ -158,7 +194,19 @@ def main():
                         output_file.write(f"类别置信度: {[f'{p:.8f}' for p in class_probs]}\n")
                         output_file.write("-" * 50 + "\n")
 
+                        if args.hard_example_dir and pred_class != true_class:
+                            target_path = build_hard_example_path(
+                                args.hard_example_dir,
+                                logger.class_names[true_class],
+                                logger.class_names[pred_class],
+                                image_path
+                            )
+                            shutil.copy2(image_path, target_path)
+                            hard_example_count += 1
+
         print(f"总验证样本数: {total_samples}")
+        if args.hard_example_dir:
+            print(f"已导出难例样本数: {hard_example_count} -> {args.hard_example_dir}")
     except RuntimeError as e:
         print(f"验证过程异常: {str(e)}")
         return
@@ -173,6 +221,11 @@ def main():
         print(f"\n验证结果 | 准确率: {logger.val_metrics['accuracy']:.2%}")
     else:
         print("Warning: 验证指标未计算，请检查数据记录")
+    report_paths = logger.get_report_paths()
+    print(f"分类报告: {report_paths['classification_report']}")
+    print(f"混淆矩阵: {report_paths['confusion_matrix']}")
+    print(f"分类指标图: {report_paths['classification_metrics']}")
+    logger.writer.close()
 
 
 if __name__ == "__main__":
