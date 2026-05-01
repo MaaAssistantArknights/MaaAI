@@ -23,6 +23,7 @@ skill_ready/
 ├── train.py                # 训练脚本
 ├── split_dataset.py        # 从训练集划分验证集
 ├── deduplicate_dataset.py  # 对相似截图做哈希去重
+├── clean_err_conflicts.py  # 删除普通目录中已被 *_err 覆盖的同图样本
 ├── validate.py             # PyTorch模型验证
 ├── export.py               # ONNX模型导出
 ├── onnx_inference.py       # ONNX模型验证
@@ -67,6 +68,9 @@ datasets/
 # 先对训练集去重，重复图会被移到单独目录
 python deduplicate_dataset.py --input_dir datasets/train --duplicates_dir datasets/duplicates/train --distance_threshold 4 --clear_duplicates
 
+# 如果 *_err 中已存在同图，则从普通目录删除；也可以先用 --dry_run 只出报告
+python clean_err_conflicts.py --input_dir datasets/train --dry_run
+
 # 从训练集抽取 10% 到验证集
 python split_dataset.py --train_dir datasets/train --val_dir datasets/val --val_ratio 0.1 --clear_val
 
@@ -82,6 +86,8 @@ python train.py --config configs/mobilenetv4_conv_small.yaml --weights checkpoin
 
 `deduplicate_dataset.py` 会对 `train` 下的 `c/n/y/c_err/n_err/y_err` 六个目录按真实标签分组做 dHash 去重，只在同一真实类别内比较相似度，避免跨类误删。重复图片会被移动到单独的 `duplicates` 目录，并保留原始来源子目录；去重明细会写入 `dedup_report.tsv`。
 默认阈值是 4，适合处理短时间连续截图导致的高度相似样本；如果发现去重过严或过松，可以调 `--distance_threshold`。
+
+`clean_err_conflicts.py` 会先收集所有 `*_err` 目录中的图片指纹，再扫描普通目录 `c/n/y`。只要普通目录里存在与任意 `*_err` 完全相同的图片，就会把普通目录中的那份删除；匹配不要求目录对应，因此像 `n_err` 与 `y` 中的同图也会删掉 `y`。如需保守处理，可以加 `--removed_dir datasets/duplicates/err_conflicts` 改为移动备份，而不是直接删除。
 
 推荐迭代方式：当前版本收集两份新数据，一份直接补到 `train`，一份单独补到 `val`；等下一批新数据到来后，再把上一轮 `val` 中已经看过的样本并回 `train`，重新划一轮新的验证集。
 
