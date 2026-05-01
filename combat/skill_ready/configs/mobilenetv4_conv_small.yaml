@@ -19,6 +19,7 @@ training:
       enabled: true
       weight: 0.75
       c_to_y: 2.5
+      n_to_y: 0.75
   optimizer:
     type: "AdamW"
     lr: 1e-5
