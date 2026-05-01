@@ -10,6 +10,7 @@ class MetricLogger:
         self.log_dir = os.path.join("logs", log_dir, model_name, time.strftime("%Y%m%d-%H%M%S"))
         self.writer = SummaryWriter(self.log_dir)
         self.class_names = class_names
+        self.nc_equivalent_indices = self._resolve_class_indices(('c', 'n'))
         self.model_size = None
         self.flops = None
         if class_weights is not None and hasattr(class_weights, 'detach'):
@@ -28,9 +29,15 @@ class MetricLogger:
         self.epoch = 0  # 添加 epoch 属性
         self.reset()
 
+    def _resolve_class_indices(self, class_names):
+        index_map = {name: index for index, name in enumerate(self.class_names)}
+        if not all(name in index_map for name in class_names):
+            return None
+        return np.asarray([index_map[name] for name in class_names], dtype=np.int64)
+
     def reset(self):
         self.train_metrics = {'loss': [], 'outputs': [], 'labels': []}
-        self.val_metrics = {'loss': [], 'outputs': [], 'labels': []}
+        self.val_metrics = {'loss': [], 'outputs': [], 'labels': [], 'accuracy': 0.0, 'accuracy_nc_merged': 0.0}
 
     def new_epoch(self):
         self.reset()
@@ -45,19 +52,35 @@ class MetricLogger:
         self.val_metrics['outputs'].append(outputs.detach().cpu().numpy())
         self.val_metrics['labels'].append(labels.detach().cpu().numpy())
 
+    def _get_accuracy_weights(self, phase, labels):
+        if phase == 'val' and self.val_sample_weights is not None:
+            return self.val_sample_weights
+        if phase == 'val' and self.class_weights is not None:
+            return self.class_weights[labels.astype(np.int64)]
+        return None
+
+    def _compute_accuracy(self, matches, weights=None):
+        if weights is None:
+            return float(np.mean(matches))
+        return float(np.average(matches, weights=weights))
+
+    def _compute_nc_merged_accuracy(self, preds, labels, weights=None):
+        if self.nc_equivalent_indices is None:
+            return self._compute_accuracy(preds == labels, weights)
+
+        nc_match = np.isin(labels, self.nc_equivalent_indices) & np.isin(preds, self.nc_equivalent_indices)
+        merged_matches = (preds == labels) | nc_match
+        return self._compute_accuracy(merged_matches, weights)
+
     def _calculate_metrics(self, phase):
         outputs = np.concatenate(self.__dict__[f'{phase}_metrics']['outputs'])
         labels = np.concatenate(self.__dict__[f'{phase}_metrics']['labels'])
         preds = np.argmax(outputs, axis=1)
 
         # 基础指标
-        if phase == 'val' and self.val_sample_weights is not None:
-            accuracy = np.average(preds == labels, weights=self.val_sample_weights)
-        elif phase == 'val' and self.class_weights is not None:
-            sample_weights = self.class_weights[labels.astype(np.int64)]
-            accuracy = np.average(preds == labels, weights=sample_weights)
-        else:
-            accuracy = np.mean(preds == labels)
+        weights = self._get_accuracy_weights(phase, labels)
+        accuracy = self._compute_accuracy(preds == labels, weights)
+        accuracy_nc_merged = self._compute_nc_merged_accuracy(preds, labels, weights)
         loss = np.mean(self.__dict__[f'{phase}_metrics']['loss'])
 
         # 混淆矩阵
@@ -72,6 +95,7 @@ class MetricLogger:
         
         return {
             'accuracy': accuracy,
+            'accuracy_nc_merged': accuracy_nc_merged,
             'loss': loss,
             'cm': cm,
             'cm_norm': cm_norm,
@@ -89,6 +113,7 @@ class MetricLogger:
         train_stats = self._calculate_metrics('train')
         val_stats = self._calculate_metrics('val')
         self.val_metrics['accuracy'] = val_stats['accuracy']
+        self.val_metrics['accuracy_nc_merged'] = val_stats['accuracy_nc_merged']
         self.history['train_loss'].append(train_stats['loss'])
         self.history['train_accuracy'].append(train_stats['accuracy'])
         self.history['val_loss'].append(val_stats['loss'])
@@ -99,13 +124,14 @@ class MetricLogger:
         
         # 生成可视化报告
         self._save_confusion_matrix(val_stats['cm_norm'], 'val_confusion_matrix')
-        self._save_classification_report(val_stats['report'])
+        self._save_classification_report(val_stats['report'], val_stats['accuracy_nc_merged'])
         self._save_classification_metrics_chart(val_stats['report'], 'val_classification_metrics')
         self._save_training_curves('training_curves')
         
         # 打印概要
         print(f"Epoch Summary - Train Loss: {train_stats['loss']:.4f} | Val Loss: {val_stats['loss']:.4f}")
         print(f"Val Accuracy: {val_stats['accuracy']:.2%}")
+        print(f"Val Accuracy (c/n merged): {val_stats['accuracy_nc_merged']:.2%}")
         if self.model_size is not None:
             print(f"Model Size: {self.model_size:.2f} MB")
         if self.flops is not None:
@@ -124,6 +150,7 @@ class MetricLogger:
         # 更新验证准确率
         if 'val' in stats:
             self.val_metrics['accuracy'] = stats['val']['accuracy']
+            self.val_metrics['accuracy_nc_merged'] = stats['val']['accuracy_nc_merged']
         
         # 记录到TensorBoard
         if 'train' in stats and 'val' in stats:
@@ -134,17 +161,20 @@ class MetricLogger:
         # 生成可视化报告
         if 'val' in stats:
             self._save_confusion_matrix(stats['val']['cm_norm'], 'val_confusion_matrix')
-            self._save_classification_report(stats['val']['report'])
+            self._save_classification_report(stats['val']['report'], stats['val']['accuracy_nc_merged'])
             self._save_classification_metrics_chart(stats['val']['report'], 'val_classification_metrics')
         
         # 打印结果
         if 'val' in stats:
             print(f"Val Accuracy: {stats['val']['accuracy']:.2%}")
+            print(f"Val Accuracy (c/n merged): {stats['val']['accuracy_nc_merged']:.2%}")
 
     def _log_to_tensorboard(self, train_stats, val_stats):
         self.writer.add_scalars('Loss', {'train': train_stats['loss'], 'val': val_stats['loss']}, self.epoch)
         self.writer.add_scalar('Accuracy/train', train_stats['accuracy'], self.epoch)
         self.writer.add_scalar('Accuracy/val', val_stats['accuracy'], self.epoch)
+        self.writer.add_scalar('Accuracy/train_nc_merged', train_stats.get('accuracy_nc_merged', 0.0), self.epoch)
+        self.writer.add_scalar('Accuracy/val_nc_merged', val_stats['accuracy_nc_merged'], self.epoch)
         
         # 记录混淆矩阵图像
         fig = self._plot_confusion_matrix(val_stats['cm_norm'])
@@ -178,12 +208,14 @@ class MetricLogger:
         fig.savefig(os.path.join(self.log_dir, f'{name}.png'), bbox_inches='tight')
         plt.close(fig)
 
-    def _save_classification_report(self, report):
+    def _save_classification_report(self, report, accuracy_nc_merged=None):
         with open(os.path.join(self.log_dir, 'classification_report.txt'), 'w') as f:
             f.write(f"{'Class':<10} {'Precision':<10} {'Recall':<10} {'F1-score':<10}\n")
             for cls in self.class_names:
                 f.write(f"{cls:<10} {report[cls]['precision']:<10.2f} {report[cls]['recall']:<10.2f} {report[cls]['f1-score']:<10.2f}\n")
             f.write(f"\nOverall Accuracy: {report['accuracy']:.2%}")
+            if accuracy_nc_merged is not None:
+                f.write(f"\nOverall Accuracy (c/n merged): {accuracy_nc_merged:.2%}")
 
     def _plot_classification_metrics(self, report):
         metrics = ['precision', 'recall', 'f1-score']

@@ -219,6 +219,7 @@ def main():
     logger.finalize_val()
     if 'accuracy' in logger.val_metrics:
         print(f"\n验证结果 | 准确率: {logger.val_metrics['accuracy']:.2%}")
+        print(f"验证结果 | 准确率(c/n不区分): {logger.val_metrics['accuracy_nc_merged']:.2%}")
     else:
         print("Warning: 验证指标未计算，请检查数据记录")
     report_paths = logger.get_report_paths()
