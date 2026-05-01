@@ -1,9 +1,6 @@
 import argparse
-import hashlib
 import os
 import shutil
-
-from PIL import Image, UnidentifiedImageError
 
 from core.data_loader import DEFAULT_CLASS_NAMES, resolve_canonical_class_name
 
@@ -25,17 +22,6 @@ def iter_image_files(folder_path):
     for filename in sorted(os.listdir(folder_path)):
         if filename.lower().endswith(IMAGE_EXTENSIONS):
             yield filename
-
-
-def compute_image_digest(image_path):
-    with Image.open(image_path) as image:
-        rgb_image = image.convert('RGB')
-        width, height = rgb_image.size
-        digest = hashlib.sha256()
-        digest.update(width.to_bytes(4, byteorder='big', signed=False))
-        digest.update(height.to_bytes(4, byteorder='big', signed=False))
-        digest.update(rgb_image.tobytes())
-    return digest.hexdigest()
 
 
 def collect_samples(input_dir, class_names):
@@ -102,18 +88,12 @@ def clean_err_conflicts(input_dir, removed_dir=None, report_path=None, clear_rem
     class_names = list(DEFAULT_CLASS_NAMES)
     samples, skipped_folders = collect_samples(input_dir, class_names)
 
-    err_hashes = {}
-    invalid_images = []
+    err_name_map = {}
 
     for sample in samples:
         if not sample['is_hard_case']:
             continue
-        try:
-            image_digest = compute_image_digest(sample['source_path'])
-        except (OSError, UnidentifiedImageError) as exc:
-            invalid_images.append((sample['source_path'], str(exc)))
-            continue
-        err_hashes.setdefault(image_digest, []).append(sample)
+        err_name_map.setdefault(sample['filename'], []).append(sample)
 
     summary = []
     total_removed = 0
@@ -124,13 +104,7 @@ def clean_err_conflicts(input_dir, removed_dir=None, report_path=None, clear_rem
         removed_count = 0
 
         for sample in class_samples:
-            try:
-                image_digest = compute_image_digest(sample['source_path'])
-            except (OSError, UnidentifiedImageError) as exc:
-                invalid_images.append((sample['source_path'], str(exc)))
-                continue
-
-            matched_err_samples = err_hashes.get(image_digest)
+            matched_err_samples = err_name_map.get(sample['filename'])
             if not matched_err_samples:
                 continue
 
@@ -147,7 +121,7 @@ def clean_err_conflicts(input_dir, removed_dir=None, report_path=None, clear_rem
             total_removed += 1
             matched_paths = ';'.join(matched_sample['source_path'] for matched_sample in matched_err_samples)
             report_rows.append(
-                f"{sample['source_path']}\t{sample['source_folder']}\t{action_target}\t{matched_paths}\t{image_digest}"
+                f"{sample['source_path']}\t{sample['source_folder']}\t{sample['filename']}\t{action_target}\t{matched_paths}"
             )
 
         summary.append({
@@ -157,25 +131,17 @@ def clean_err_conflicts(input_dir, removed_dir=None, report_path=None, clear_rem
         })
 
     with open(report_path, 'w', encoding='utf-8') as report_file:
-        report_file.write('normal_path\tnormal_folder\taction\tmatched_err_paths\timage_digest\n')
+        report_file.write('normal_path\tnormal_folder\tfilename\taction\tmatched_err_paths\n')
         for row in report_rows:
             report_file.write(f'{row}\n')
-
-    invalid_report_path = None
-    if invalid_images:
-        invalid_report_path = os.path.splitext(report_path)[0] + '_invalid_images.txt'
-        with open(invalid_report_path, 'w', encoding='utf-8') as invalid_file:
-            for path, error_message in invalid_images:
-                invalid_file.write(f'{path}\t{error_message}\n')
 
     return {
         'summary': summary,
         'skipped_folders': skipped_folders,
         'total_removed': total_removed,
-        'err_reference_count': sum(len(samples) for samples in err_hashes.values()),
-        'unique_err_reference_count': len(err_hashes),
+        'err_reference_count': sum(len(samples) for samples in err_name_map.values()),
+        'unique_err_reference_count': len(err_name_map),
         'report_path': report_path,
-        'invalid_report_path': invalid_report_path,
     }
 
 
@@ -192,7 +158,7 @@ def main():
     action_text = '仅报告' if args.dry_run else ('移动到 removed_dir' if args.removed_dir else '直接删除')
     print(
         f"完成 _err 冲突清理 | 输入目录: {args.input_dir} | 动作: {action_text} | "
-        f"_err 参考图: {result['err_reference_count']} | 唯一图像指纹: {result['unique_err_reference_count']} | "
+        f"_err 参考图: {result['err_reference_count']} | 唯一文件名: {result['unique_err_reference_count']} | "
         f"清理数量: {result['total_removed']}"
     )
     for item in result['summary']:
@@ -205,8 +171,6 @@ def main():
         print(f"已跳过未识别目录: {result['skipped_folders']}")
 
     print(f"清理报告: {result['report_path']}")
-    if result['invalid_report_path']:
-        print(f"异常图片报告: {result['invalid_report_path']}")
 
 
 if __name__ == '__main__':
