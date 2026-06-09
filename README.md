@@ -17,7 +17,7 @@
 
 区分三种技能状态，有(y) / 无(n) / 可关闭(c)
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev-v2/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
 - [Python 推理参考](https://github.com/MaaAssistantArknights/MaaAI/blob/main/combat/skill_ready/onnx_inference.py)
 
 ## [战斗干员（血条）检测](combat/operators)
@@ -27,7 +27,7 @@
 [YOLOv8](https://github.com/ultralytics/ultralytics) N 检测模型，模型大小 12M，CPU 推理耗时约 50ms  
 输入是 16:9 的图片缩放到 640x640
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldDetector.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev-v2/src/MaaCore/Vision/Battle/BattlefieldDetector.cpp)
 
 ## [战斗干员方向识别](combat/deploy_direction)
 
@@ -37,7 +37,7 @@
 四分类 [MnistSimpleCNN](https://arxiv.org/abs/2008.10400) 网络，模型大小 18M，CPU 推理耗时约 20ms  
 输入是 720p 下以格子正中心 96x96 的图片  
 
-- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
+- [C++ 推理参考](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev-v2/src/MaaCore/Vision/Battle/BattlefieldClassifier.cpp)
 
 ## 其他
 
