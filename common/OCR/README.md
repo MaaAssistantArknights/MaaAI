@@ -4,6 +4,26 @@
 
 本项目主要提供生成数据集的脚本，以及训练完的模型产物
 
+## 目录结构
+
+```text
+OCR/
+├── datasets/
+│   ├── custom/       # 手工裁剪并标注的补充数据
+│   ├── generated/    # 生成的语料、图片和 PaddleOCR 标签（不提交）
+│   ├── keys/         # 各语言字符字典
+│   └── render.yaml   # 合成图片配置
+├── game_data/        # 外部游戏数据、字体和 text_renderer（不提交）
+├── models/
+│   ├── configs/      # PaddleOCR 训练配置
+│   ├── output/       # checkpoint 和导出模型（不提交）
+│   └── pretrained/   # 下载的预训练模型（不提交）
+└── scripts/
+    ├── data/         # 语料、标签和数据集处理脚本
+    ├── model/        # 模型转换与优化脚本
+    └── generate_dataset.sh
+```
+
 ## 使用方法
 
 目前仅有 rec（识别）模型，检测模型可以直接用飞桨官方的。需要将对应的 rec 模型文件和 keys.txt 替换成 [release](https://github.com/MaaAssistantArknights/ArknightsTrainingData/releases/latest) 包里的
@@ -36,21 +56,21 @@
 
 4. 整理你自己的数据集
 
-    如果想增加某些场景的识别率，参考 [my_data](./my_data/README.md)，把额外的数据集放进来  
+    如果想增加某些场景的识别率，参考 [datasets/custom](./datasets/custom/README.md)，把额外的数据集放进来
     （没有自己数据集的可以忽略这一步）
 
 5. 生成数据集
 
     ```bash
     # 默认只生成简中数据，其他语言改下开头的变量即可
-    sh ./steps.sh
+    bash ./scripts/generate_dataset.sh
     ```
 
 6. 开始训练
 
     ```bash
     # 简中的，其他语言请替换成对应的配置
-    python PaddleOCR/tools/train.py -c ch_PP-OCRv3_rec_distillation.yml
+    python PaddleOCR/tools/train.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml
     ```
 
     一些配置文件中可能要修改的项：
@@ -65,7 +85,7 @@
 8. 导出模型
 
     ```bash
-    python PaddleOCR/tools/export_model.py -c ch_PP-OCRv3_rec_distillation.yml -o Global.checkpoints=./output/ja_JP/model/epoch/latest/best_accuracy
+    python PaddleOCR/tools/export_model.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml -o Global.checkpoints=./models/output/zh_CN/epoch/latest/best_accuracy
     ```
 
 只是个大致的流程，都还是 PaddleOCR 的那套，更多详细的参数等请参考 PaddleOCR 的文档
@@ -85,7 +105,7 @@
     docker build -t maa_train . \   # 以下为可选参数
         --build-arg VERSION=22.05 \ # Nvdia 镜像的版本，默认为22.05， 可选的版本参考之前的链接
         --build-arg OCR_LANG=zh_CN \ # 训练数据集的语言，docker将拷贝对应语言数据集到镜像，默认zh_CN, 可选`zh_CN | ja_JP | zh_TW | en_US`
-        --build_arg PRETRAINED_MODEL=ch_PP-OCRv3_rec_distillation # 预训练模型权重名称, 默认为简中知识蒸馏模型
+        --build-arg PRETRAINED_MODEL=ch_PP-OCRv3_rec_train # 预训练模型目录名称，默认为简中模型
     ``` 
 
 2. 运行镜像
@@ -98,7 +118,7 @@
     进入容器后，将第六步中PaddleOCR的位置替换为`../PaddleOCR`，即
 
     ```bash
-    python ../PaddleOCR/tools/train.py -c ch_PP-OCRv3_rec_distillation.yml 
+    python ../PaddleOCR/tools/train.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml
     ```
 
 ## 开源库

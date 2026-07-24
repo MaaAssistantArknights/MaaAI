@@ -5,15 +5,15 @@ Global:
   epoch_num: 150
   log_smooth_window: 20
   print_batch_step: 100
-  save_model_dir: ./output/ja_JP/model/epoch
+  save_model_dir: ./models/output/ja_JP/epoch
   save_epoch_step: 3
   eval_batch_step: [1000, 2000]
   cal_metric_during_train: true
-  pretrained_model: ./pretrained_model/japan_PP-OCRv3_rec_train/best_accuracy
-  # checkpoints: ./output/ja_JP/model/epoch/latest
-  save_inference_dir: ./output/ja_JP/model/inference
+  pretrained_model: ./models/pretrained/japan_PP-OCRv3_rec_train/best_accuracy
+  # checkpoints: ./models/output/ja_JP/epoch/latest
+  save_inference_dir: ./models/output/ja_JP/inference
   use_visualdl: false
-  character_dict_path: ./output/ja_JP/keys.txt
+  character_dict_path: ./datasets/generated/ja_JP/keys.txt
   max_text_length: &max_text_length 25
   infer_mode: false
   use_space_char: false
@@ -78,7 +78,7 @@ Train:
     data_dir: ./
     ext_op_transform_idx: 1
     label_file_list:
-    - ./output/ja_JP/rec_gt_train.txt
+    - ./datasets/generated/ja_JP/rec_gt_train.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
@@ -108,7 +108,7 @@ Eval:
     name: SimpleDataSet
     data_dir: ./
     label_file_list:
-    - ./output/ja_JP/rec_gt_test.txt
+    - ./datasets/generated/ja_JP/rec_gt_test.txt
     transforms:
     - DecodeImage:
         img_mode: BGR

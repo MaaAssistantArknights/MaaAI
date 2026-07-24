@@ -131,12 +131,24 @@ dmypy.json
 datasets
 logs
 checkpoints
-output
-ArknightsGameData
-text_renderer
-output
-fonts
-pretrained_model
+/output/
+ArknightsGameData/
+text_renderer/
+fonts/
+pretrained_model/
+
+# OCR generated and downloaded assets
+!/common/OCR/datasets/
+/common/OCR/datasets/generated/*
+!/common/OCR/datasets/generated/.gitkeep
+/common/OCR/game_data/ArknightsGameData/
+/common/OCR/game_data/ArknightsGamedata/
+/common/OCR/game_data/fonts/
+/common/OCR/game_data/text_renderer/
+/common/OCR/models/output/*
+!/common/OCR/models/output/.gitkeep
+/common/OCR/models/pretrained/*
+!/common/OCR/models/pretrained/.gitkeep
 
 /.vs
 /.vscode

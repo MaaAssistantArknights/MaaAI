@@ -1,13 +1,22 @@
-import re
+import argparse
 import os
-import sys
-from fontTools.ttLib import TTFont
+import re
+from pathlib import Path
 
-client = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("client", choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR", "en_US"))
+parser.add_argument("--game-data", type=Path, default=Path("game_data/ArknightsGameData"))
+parser.add_argument("--fonts-dir", type=Path, default=Path("game_data/fonts/SubsetOTF"))
+parser.add_argument("--keys-dir", type=Path, default=Path("datasets/keys"))
+parser.add_argument("--output-dir", type=Path, default=Path("datasets/generated"))
+args = parser.parse_args()
+client = args.client
+
+from fontTools.ttLib import TTFont
 
 unicode_map = {}
 
-font_dir = os.path.join("fonts/SubsetOTF", client.split('_')[1])
+font_dir = args.fonts_dir / client.split('_')[1]
 for f in os.listdir(font_dir):
     if not f.endswith("otf"):
         continue
@@ -78,13 +87,9 @@ def find_all_wording(dir):
     return result
 
 
-# for root, dirs, _ in os.walk('ArknightsGameData'):
-#     for client in dirs:
-
-wording = find_all_wording(os.path.join(
-    'ArknightsGameData', client, 'gamedata', 'excel'))
+wording = find_all_wording(args.game_data / client / 'gamedata' / 'excel')
 wording.update(set([chr(x) for x in range(33, 127)]))
-output_dir = os.path.join('output', client)
+output_dir = args.output_dir / client
 os.makedirs(output_dir, exist_ok=True)
 
 all_context = '\n'.join(wording)
@@ -96,7 +101,7 @@ for k in all_context:
     if ord(k) <= 32:
         continue
     keys.add(k)
-with open(f'raw_keys/{client}.txt', 'r', encoding='utf-8') as f:
+with open(args.keys_dir / f'{client}.txt', 'r', encoding='utf-8') as f:
     key_text = f.read()
 for k in keys:
     if k not in key_text:

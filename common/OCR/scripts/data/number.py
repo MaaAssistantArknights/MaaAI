@@ -90,10 +90,10 @@ def parse_args():
     parser.add_argument(
         "--game_data",
         "-g",
-        default="ArknightsGameData",
+        default="game_data/ArknightsGameData",
         type=Path,
-        help="path to game_data, default to \"ArknightsGameData\"")
-    parser.add_argument("--output_dir", "-o", default='./output', type=Path)
+        help="path to game data, default to game_data/ArknightsGameData")
+    parser.add_argument("--output_dir", "-o", default="datasets/generated", type=Path)
     parser.add_argument(
         "--ratio_100m",
         "-r",
