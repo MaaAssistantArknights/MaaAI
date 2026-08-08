@@ -1,8 +1,10 @@
 # OCR
 
-基于 PaddleOCR，整理《明日方舟》所有文本生成数据集进行训练  
+基于 PaddleOCR（PP-OCRv6），整理《明日方舟》所有文本生成数据集进行训练
 
 本项目主要提供生成数据集的脚本，以及训练完的模型产物
+
+PP-OCRv6 为多语言统一模型（中/英/日/韩/繁中一网打尽），因此所有游戏客户端（cn/en/kr/jp/tw）的数据合并为一份多语言数据集，只微调一个 rec 模型即可
 
 ## 目录结构
 
@@ -10,8 +12,8 @@
 OCR/
 ├── datasets/
 │   ├── custom/       # 手工裁剪并标注的补充数据
-│   ├── generated/    # 生成的语料、图片和 PaddleOCR 标签（不提交）
-│   ├── keys/         # 各语言字符字典
+│   ├── generated/    # 生成的语料、图片、多语言标签（不提交）
+│   ├── keys/         # 各语言基础字符字典
 │   └── render.yaml   # 合成图片配置
 ├── game_data/        # 外部游戏数据、字体和 text_renderer（不提交）
 ├── models/
@@ -19,7 +21,7 @@ OCR/
 │   ├── output/       # checkpoint 和导出模型（不提交）
 │   └── pretrained/   # 下载的预训练模型（不提交）
 └── scripts/
-    ├── data/         # 语料、标签和数据集处理脚本
+    ├── data/         # 语料、标签、数据集合并等处理脚本
     ├── model/        # 模型转换与优化脚本
     └── generate_dataset.sh
 ```
@@ -30,7 +32,7 @@ OCR/
 
 可选使用方法：
 
-- 最简单：使用 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 推理，参考 [使用方法](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/doc/doc_ch/quickstart.md)
+- 最简单：使用 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 推理，参考 [通用 OCR 产线文档](https://www.paddleocr.ai/latest/version3.x/pipeline_usage/OCR.html)
 - 最推荐：使用 [FastDeploy](https://github.com/PaddlePaddle/FastDeploy) 部署，可自由选择 ONNX Runtime, Paddle Inference, TensorRT, OpenVINO 等后端进行推理
 - 最折腾：使用 [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX) 转换为 ONNX 模型，使用 [RapidOCR](https://github.com/RapidAI/RapidOCR) + ONNX Runtime 进行推理
 
@@ -62,30 +64,35 @@ OCR/
 5. 生成数据集
 
     ```bash
-    # 默认只生成简中数据，其他语言改下开头的变量即可
+    # 依次生成 zh_CN / zh_TW / ja_JP / ko_KR / en_US 五种客户端数据，并合并为多语言数据集
     bash ./scripts/generate_dataset.sh
     ```
 
 6. 开始训练
 
     ```bash
-    # 简中的，其他语言请替换成对应的配置
-    python PaddleOCR/tools/train.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml
+    python PaddleOCR/tools/train.py -c models/configs/PP-OCRv6_medium_rec.yml
     ```
 
     一些配置文件中可能要修改的项：
     - `num_workers`: 读取数据集的进程数。不能大于你的 CPU 线程数，但是太大了也没意义，不造成性能瓶颈就行，一般 4 或者 8 就差不多了。Windows 不支持这项，调也没用，所以很慢
     - `batch_size_per_card`: batch size, 一般来说越大越快，但会吃更多显存，自己看着调
-    - `lr.values` / `learning_rate`: 学习率，原则上要和 batch size 等比例调整
+    - `lr.learning_rate`: 学习率，原则上要和 batch size 等比例调整
 
 7. 断点训练
 
-    把配置文件中 `checkpoints` 那项去掉注释
+    把配置文件中 `checkpoints` 那项指向上次保存的权重即可
 
-8. 导出模型
+8. 评估
 
     ```bash
-    python PaddleOCR/tools/export_model.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml -o Global.checkpoints=./models/output/zh_CN/epoch/latest/best_accuracy
+    python PaddleOCR/tools/eval.py -c models/configs/PP-OCRv6_medium_rec.yml -o Global.pretrained_model=./models/output/PP-OCRv6_medium_rec/best_accuracy.pdparams
+    ```
+
+9. 导出模型
+
+    ```bash
+    python PaddleOCR/tools/export_model.py -c models/configs/PP-OCRv6_medium_rec.yml -o Global.pretrained_model=./models/output/PP-OCRv6_medium_rec/best_accuracy.pdparams Global.save_inference_dir=./models/output/PP-OCRv6_medium_rec/inference
     ```
 
 只是个大致的流程，都还是 PaddleOCR 的那套，更多详细的参数等请参考 PaddleOCR 的文档
@@ -97,15 +104,14 @@ OCR/
 0. 依赖
 
 - `docker` 以及 `nvidia-docker` 具体安装流程参考 [Nvidia文档](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html) 
-- 对应版本的 CUDA, 本仓库提供的 Dockerfile 默认版本支持 nvidia 驱动版本 >= 515 (CUDA >= 11.7)
+- 本仓库提供的 Dockerfile 基于 Paddle 3.0.0 GPU 镜像（CUDA 11.8 / cuDNN 8.9 / TensorRT 8.6）
 
 1. 获取镜像
 
     ```bash
     docker build -t maa_train . \   # 以下为可选参数
-        --build-arg VERSION=22.05 \ # Nvdia 镜像的版本，默认为22.05， 可选的版本参考之前的链接
-        --build-arg OCR_LANG=zh_CN \ # 训练数据集的语言，docker将拷贝对应语言数据集到镜像，默认zh_CN, 可选`zh_CN | ja_JP | zh_TW | en_US`
-        --build-arg PRETRAINED_MODEL=ch_PP-OCRv3_rec_train # 预训练模型目录名称，默认为简中模型
+        --build-arg VERSION=3.0.0 \ # Paddle 镜像的版本，默认为 3.0.0
+        --build-arg PRETRAINED_MODEL=PP-OCRv6_medium_rec_pretrained.pdparams # 预训练权重文件名，默认为 v6 medium
     ``` 
 
 2. 运行镜像
@@ -118,7 +124,7 @@ OCR/
     进入容器后，将第六步中PaddleOCR的位置替换为`../PaddleOCR`，即
 
     ```bash
-    python ../PaddleOCR/tools/train.py -c models/configs/ch_PP-OCRv3_rec_distillation.yml
+    python ../PaddleOCR/tools/train.py -c models/configs/PP-OCRv6_medium_rec.yml
     ```
 
 ## 开源库

@@ -14,9 +14,18 @@ client = args.client
 
 from fontTools.ttLib import TTFont
 
+# 每种语言对应思源黑体的字体子集；en_US 复用 CN（含拉丁字符）
+FONT_LANG_MAP = {
+    "zh_CN": "CN",
+    "zh_TW": "TW",
+    "ja_JP": "JP",
+    "ko_KR": "KR",
+    "en_US": "CN",
+}
+
 unicode_map = {}
 
-font_dir = args.fonts_dir / client.split('_')[1]
+font_dir = args.fonts_dir / FONT_LANG_MAP[client]
 for f in os.listdir(font_dir):
     if not f.endswith("otf"):
         continue

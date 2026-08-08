@@ -1,8 +1,8 @@
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("input", nargs="?", default="models/output/inference.onnx")
-parser.add_argument("output", nargs="?", default="models/output/inference_optimized.onnx")
+parser.add_argument("input", nargs="?", default="models/output/PP-OCRv6_medium_rec/inference.onnx")
+parser.add_argument("output", nargs="?", default="models/output/PP-OCRv6_medium_rec/inference_optimized.onnx")
 args = parser.parse_args()
 
 import onnx

@@ -36,6 +36,7 @@ def generate_numbers(lang: ClientLang, counts: Tuple = (10000, 20)):
         "zh_TW": "萬億",
         "ja_JP": "万億",
         "ko_KR": "만억",
+        "en_US": "KM",
     }
     for i, count in enumerate(counts):
         unit = UNITS_BY_LANG[lang][i]
@@ -84,7 +85,7 @@ def parse_args():
     parser = A.ArgumentParser()
     parser.add_argument("--lang",
                         "-l",
-                        choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR"),
+                        choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR", "en_US"),
                         help="target language, default to \"zh_CN\"",
                         default="zh_CN")
     parser.add_argument(
