@@ -1,0 +1,23 @@
+[project]
+name = "maa-ocr"
+version = "0.1.0"
+description = "Arknights OCR dataset generation and PP-OCRv6 fine-tuning"
+requires-python = ">=3.11"
+dependencies = [
+    "fonttools",
+    "pillow",
+    "opencv-python-headless",
+    "numpy",
+    "matplotlib",
+    "easydict",
+    "tenacity",
+    "tqdm",
+    "pyyaml",
+]
+
+# 模型优化依赖（paddle2onnx 无 cp313 wheel，需在 PaddleOCR 环境中另行安装）
+[project.optional-dependencies]
+model = [
+    "onnx",
+    "onnxoptimizer",
+]

@@ -19,7 +19,7 @@ def main():
 
     for lang in args.langs:
         lang_dir = args.generated / lang
-        keys.update(k for k in lang_dir.joinpath("keys.txt").read_text(encoding="utf-8").splitlines() if k)
+        keys.update(k.strip() for k in lang_dir.joinpath("keys.txt").read_text(encoding="utf-8").splitlines() if k.strip())
         for name, target in (("rec_gt_train.txt", train_lines), ("rec_gt_test.txt", test_lines)):
             label_file = lang_dir.joinpath(name)
             if label_file.exists():

@@ -127,6 +127,12 @@ for k in keys:
 with open(os.path.join(output_dir, 'keys.txt'), 'w', encoding='utf-8') as f:
     f.write(key_text)
 
+# 渲染用字典：仅包含字体支持的字形，否则 --strict 模式下会因不支持的字形无限重试
+render_key_text = ''.join(
+    k + '\n' for k in key_text.splitlines() if k and ord(k) in unicode_map)
+with open(os.path.join(output_dir, 'keys_render.txt'), 'w', encoding='utf-8') as f:
+    f.write(render_key_text)
+
 short_context = '\n'.join([w for w in wording if len(w) < 7])
 short_output_dir = os.path.join(output_dir, 'short')
 os.makedirs(short_output_dir, exist_ok=True)
