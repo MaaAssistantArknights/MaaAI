@@ -55,8 +55,13 @@ def restruct_render(input_file, output_file):
     txt_context = ''
     with open(input_file, mode='r', encoding='utf-8') as fd:
         for l in fd.readlines():
-            txt_context += os.path.dirname(input_file) + \
-                "/" + l.replace(' ', '.jpg\t')
+            l = l.rstrip('\n')
+            base, sep, word = l.partition(' ')
+            if not sep:
+                continue
+            # tmp_labels 格式为 "序号 词"，只把序号与词之间的第一个空格
+            # 替换为 .jpg\t，词内的空格必须保留
+            txt_context += os.path.dirname(input_file) + "/" + base + ".jpg\t" + word + '\n'
 
     txt_context = txt_context.replace('\\', '/')
 
