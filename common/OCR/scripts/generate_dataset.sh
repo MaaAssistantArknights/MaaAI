@@ -16,7 +16,7 @@ declare -A font_langs=(
 
 num_img=200000  # 每种语言生成的图片数量
 
-game_data_dir="game_data/ArknightsGameData"
+game_data_dir="game_data/ArknightsGamedata"
 renderer_dir="game_data/text_renderer"
 fonts_dir="game_data/fonts"
 pretrained_model="models/pretrained"
@@ -24,7 +24,7 @@ pretrained_model="models/pretrained"
 mkdir -p "$game_data_dir" "$renderer_dir" "$fonts_dir" "$pretrained_model" "datasets/generated"
 
 if [ ! -d "$game_data_dir/.git" ]; then
-    git clone https://github.com/Kengxxiao/ArknightsGameData --depth=1 "$game_data_dir"
+    git clone https://github.com/ArknightsAssets/ArknightsGamedata.git --depth=1 "$game_data_dir"
 else
     git -C "$game_data_dir" pull --ff-only
 fi

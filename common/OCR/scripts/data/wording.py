@@ -5,7 +5,7 @@ from pathlib import Path
 
 parser = argparse.ArgumentParser()
 parser.add_argument("client", choices=("zh_CN", "zh_TW", "ja_JP", "ko_KR", "en_US"))
-parser.add_argument("--game-data", type=Path, default=Path("game_data/ArknightsGameData"))
+parser.add_argument("--game-data", type=Path, default=Path("game_data/ArknightsGamedata"))
 parser.add_argument("--fonts-dir", type=Path, default=Path("game_data/fonts/SubsetOTF"))
 parser.add_argument("--keys-dir", type=Path, default=Path("datasets/keys"))
 parser.add_argument("--output-dir", type=Path, default=Path("datasets/generated"))
@@ -21,6 +21,15 @@ FONT_LANG_MAP = {
     "ja_JP": "JP",
     "ko_KR": "KR",
     "en_US": "CN",
+}
+
+# ArknightsGamedata 仓库中的语言目录名（小写）
+CLIENT_DIR_MAP = {
+    "zh_CN": "cn",
+    "zh_TW": "tw",
+    "ja_JP": "jp",
+    "ko_KR": "kr",
+    "en_US": "en",
 }
 
 unicode_map = {}
@@ -96,7 +105,7 @@ def find_all_wording(dir):
     return result
 
 
-wording = find_all_wording(args.game_data / client / 'gamedata' / 'excel')
+wording = find_all_wording(args.game_data / CLIENT_DIR_MAP[client] / 'gamedata' / 'excel')
 wording.update(set([chr(x) for x in range(33, 127)]))
 output_dir = args.output_dir / client
 os.makedirs(output_dir, exist_ok=True)

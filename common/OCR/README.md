@@ -130,6 +130,6 @@ OCR/
 ## 开源库
 
 - [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR): Awesome multilingual OCR toolkits based on PaddlePaddle
-- [ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData): 《明日方舟》游戏数据
+- [ArknightsGamedata](https://github.com/ArknightsAssets/ArknightsGamedata): 《明日方舟》游戏数据
 - [text_renderer](https://github.com/Sanster/text_renderer): Generate text images for training deep learning ocr model
 - [source-han-sans](https://github.com/adobe-fonts/source-han-sans): Source Han Sans | 思源黑体 | 思源黑體 | 思源黑體 香港 | 源ノ角ゴシック | 본고딕

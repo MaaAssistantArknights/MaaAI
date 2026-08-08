@@ -9,6 +9,15 @@ from pathlib import Path
 ClientLang = Union[Literal['zh_CN'], Literal['en_US'], Literal['ja_JP'],
                    Literal['ko_KR'], Literal['zh_TW'], ]
 
+# ArknightsGamedata 仓库中的语言目录名（小写）
+CLIENT_DIR_MAP = {
+    "zh_CN": "cn",
+    "zh_TW": "tw",
+    "ja_JP": "jp",
+    "ko_KR": "kr",
+    "en_US": "en",
+}
+
 
 def uniform_exponent_range(base: float, lo: float, hi: float, size: int):
     for _ in range(size):
@@ -23,7 +32,8 @@ def generate_stages(stages: Union[dict, str]):
             stages = json.loads(f.read())['stages']
     # Iterate through all the data
     all_stages_code = [
-        stage['code'] for stage in stages.values() if stage['code'].isascii()
+        stage['code'] for stage in stages.values()
+        if isinstance(stage.get('code'), str) and stage['code'].isascii()
     ]
     return all_stages_code
 
@@ -66,8 +76,8 @@ def main(args):
     os.makedirs(output_dir, exist_ok=True)
     f = open(output_dir / 'numbers.txt', 'w', encoding="utf-8")
     # Write stages
-    stages = generate_stages(args.game_data / args.lang / "gamedata" /
-                             "excel" / "stage_table.json")
+    stages = generate_stages(args.game_data / CLIENT_DIR_MAP[args.lang] /
+                             "gamedata" / "excel" / "stage_table.json")
     f.write('\n'.join(stages) + '\n')
 
     # write others
@@ -91,9 +101,9 @@ def parse_args():
     parser.add_argument(
         "--game_data",
         "-g",
-        default="game_data/ArknightsGameData",
+        default="game_data/ArknightsGamedata",
         type=Path,
-        help="path to game data, default to game_data/ArknightsGameData")
+        help="path to game data, default to game_data/ArknightsGamedata")
     parser.add_argument("--output_dir", "-o", default="datasets/generated", type=Path)
     parser.add_argument(
         "--ratio_100m",
