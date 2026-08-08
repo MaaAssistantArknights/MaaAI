@@ -150,5 +150,6 @@ pretrained_model/
 /common/OCR/models/pretrained/*
 !/common/OCR/models/pretrained/.gitkeep
 
+# IDE files
 /.vs
-/.vscode
+/.*code
