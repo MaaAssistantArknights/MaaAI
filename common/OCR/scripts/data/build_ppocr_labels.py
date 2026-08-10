@@ -1,6 +1,7 @@
 import os
-import sys
+import argparse
 from collections import defaultdict
+from pathlib import Path
 
 
 def as_line(input_dir, output_file):
@@ -54,8 +55,13 @@ def restruct_render(input_file, output_file):
     txt_context = ''
     with open(input_file, mode='r', encoding='utf-8') as fd:
         for l in fd.readlines():
-            txt_context += os.path.dirname(input_file) + \
-                "/" + l.replace(' ', '.jpg\t')
+            l = l.rstrip('\n')
+            base, sep, word = l.partition(' ')
+            if not sep:
+                continue
+            # tmp_labels 格式为 "序号 词"，只把序号与词之间的第一个空格
+            # 替换为 .jpg\t，词内的空格必须保留
+            txt_context += os.path.dirname(input_file) + "/" + base + ".jpg\t" + word + '\n'
 
     txt_context = txt_context.replace('\\', '/')
 
@@ -63,18 +69,31 @@ def restruct_render(input_file, output_file):
         fd.write(txt_context)
 
 
-input_dir = sys.argv[1]
-output_dir = sys.argv[2]
-region = sys.argv[3]
+parser = argparse.ArgumentParser()
+parser.add_argument("input_dir", type=Path)
+parser.add_argument("output_dir", type=Path)
+parser.add_argument("region")
+parser.add_argument("--custom-dir", type=Path, default=Path("datasets/custom"))
+args = parser.parse_args()
+
+input_dir = args.input_dir
+output_dir = args.output_dir
+region = args.region
 
 output_train_file = os.path.join(output_dir, 'rec_gt_train.txt')
 output_test_file = os.path.join(output_dir, 'rec_gt_test.txt')
+os.makedirs(output_dir, exist_ok=True)
 
-if os.path.exists(os.path.join('./my_data', region, 'train')):
-    as_line(os.path.join('./my_data', region, 'train'), output_train_file)
+# Rebuild labels from scratch so repeated runs do not duplicate generated data.
+for output_file in (output_train_file, output_test_file):
+    with open(output_file, mode='w', encoding='utf-8'):
+        pass
 
-if os.path.exists(os.path.join('./my_data', region, 'test')):
-    as_line(os.path.join('./my_data', region, 'test'), output_test_file)
+if os.path.exists(args.custom_dir / region / 'train'):
+    as_line(args.custom_dir / region / 'train', output_train_file)
+
+if os.path.exists(args.custom_dir / region / 'test'):
+    as_line(args.custom_dir / region / 'test', output_test_file)
 
 for path, _, files in os.walk(input_dir):
     for f in files:

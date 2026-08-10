@@ -1,23 +1,26 @@
 Global:
+  model_name: PP-OCRv6_medium_rec
   debug: false
   use_gpu: true
-  #use_amp: true
-  epoch_num: 150
+  epoch_num: 100
   log_smooth_window: 20
-  print_batch_step: 100
-  save_model_dir: ./output/ko_KR/model/epoch
-  save_epoch_step: 3
-  eval_batch_step: [1000, 2000]
+  print_batch_step: 10
+  save_model_dir: ./models/output/PP-OCRv6_medium_rec
+  save_epoch_step: 10
+  eval_batch_step: [0, 2000]
   cal_metric_during_train: true
-  pretrained_model: ./pretrained_model/korean_PP-OCRv3_rec_train/best_accuracy
-  # checkpoints: ./output/ko_KR/model/epoch/latest
-  save_inference_dir: ./output/ko_KR/model/inference
+  pretrained_model: ./models/pretrained/PP-OCRv6_medium_rec_pretrained.pdparams
+  checkpoints: ./models/output/PP-OCRv6_medium_rec/latest
+  save_inference_dir: ./models/output/PP-OCRv6_medium_rec/inference
   use_visualdl: false
-  character_dict_path: ./output/ko_KR/keys.txt
+  infer_img: doc/imgs_words/ch/word_1.jpg
+  character_dict_path: ./datasets/generated/keys.txt
   max_text_length: &max_text_length 25
   infer_mode: false
-  use_space_char: false
+  use_space_char: true
   distributed: true
+  save_res_path: ./models/output/rec/predicts_ppocrv6_medium.txt
+  d2s_train_image_shape: [3, 48, 320]
 
 
 Optimizer:
@@ -26,7 +29,7 @@ Optimizer:
   beta2: 0.999
   lr:
     name: Cosine
-    learning_rate: 0.0002
+    learning_rate: 0.0005
     warmup_epoch: 5
   regularizer:
     name: L2
@@ -35,50 +38,51 @@ Optimizer:
 
 Architecture:
   model_type: rec
-  algorithm: SVTR
+  algorithm: SVTR_LCNet
   Transform:
   Backbone:
-    name: MobileNetV1Enhance
-    scale: 0.5
-    last_conv_stride: [1, 2]
-    last_pool_type: avg
+    name: PPLCNetV4
+    model_size: medium
   Head:
     name: MultiHead
     head_list:
       - CTCHead:
           Neck:
-            name: svtr
-            dims: 64
+            name: lightsvtr
+            dims: 192
             depth: 2
-            hidden_dims: 120
-            use_guide: True
+            mlp_ratio: 4.0
+            local_kernel: 7
+            use_guide: false
           Head:
             fc_decay: 0.00001
-      - SARHead:
-          enc_dim: 512
+      - NRTRHead:
+          nrtr_dim: 512
           max_text_length: *max_text_length
 
 Loss:
   name: MultiLoss
   loss_config_list:
     - CTCLoss:
-    - SARLoss:
+    - NRTRLoss:
 
-PostProcess:  
+PostProcess:
   name: CTCLabelDecode
 
 Metric:
   name: RecMetric
   main_indicator: acc
-  ignore_space: False
 
 Train:
   dataset:
-    name: SimpleDataSet
+    name: MultiScaleDataSet
+    ds_width: false
     data_dir: ./
     ext_op_transform_idx: 1
     label_file_list:
-    - ./output/ko_KR/rec_gt_train.txt
+    - ./datasets/generated/rec_gt_train.txt
+    ratio_list:
+    - 0.5
     transforms:
     - DecodeImage:
         img_mode: BGR
@@ -87,44 +91,53 @@ Train:
         prob: 0.5
         ext_data_num: 2
         image_shape: [48, 320, 3]
+        max_text_length: *max_text_length
     - RecAug:
     - MultiLabelEncode:
-    - RecResizeImg:
-        image_shape: [3, 48, 320]
+        gtc_encode: NRTRLabelEncode
     - KeepKeys:
         keep_keys:
         - image
         - label_ctc
-        - label_sar
+        - label_gtc
         - length
         - valid_ratio
+  sampler:
+    name: MultiScaleSampler
+    scales: [[320, 32], [320, 48], [320, 64]]
+    first_bs: &bs 64
+    fix_bs: false
+    divided_factor: [8, 16]
+    is_training: True
   loader:
     shuffle: true
-    batch_size_per_card: 96
+    batch_size_per_card: *bs
     drop_last: true
-    num_workers: 16
+    num_workers: 8
+
 Eval:
   dataset:
     name: SimpleDataSet
     data_dir: ./
     label_file_list:
-    - ./output/ko_KR/rec_gt_test.txt
+    - ./datasets/generated/rec_gt_test.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
         channel_first: false
     - MultiLabelEncode:
+        gtc_encode: NRTRLabelEncode
     - RecResizeImg:
         image_shape: [3, 48, 320]
     - KeepKeys:
         keep_keys:
         - image
         - label_ctc
-        - label_sar
+        - label_gtc
         - length
         - valid_ratio
   loader:
     shuffle: false
     drop_last: false
-    batch_size_per_card: 96
-    num_workers: 16
+    batch_size_per_card: 128
+    num_workers: 4

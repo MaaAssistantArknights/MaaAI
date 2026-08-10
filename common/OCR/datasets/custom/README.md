@@ -1,16 +1,16 @@
-# my_data
+# Custom datasets
 
 ```txt
-|-- my_data
-    | -- zh_CN
-        | -- train
-            | -- 帕拉斯.jpg
-            | -- 幽灵鲨.jpg
-            | -- ......
-        | -- test
-            | -- 斯卡蒂.jpg
-            | -- 史尔特尔.jpg
-            | -- ......
+datasets/custom/
+└── zh_CN/
+    ├── train/
+    │   ├── 帕拉斯.jpg
+    │   ├── 幽灵鲨.jpg
+    │   └── ...
+    └── test/
+        ├── 斯卡蒂.jpg
+        ├── 史尔特尔.jpg
+        └── ...
 ```
 
 将你额外的训练集和测试集放到 `train` / `test` 文件夹里，会递归遍历文件夹内所有图片文件  
