@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "hash_text_split": {
+    "train": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "dev": [
+      8
+    ],
+    "eval": [
+      9
+    ]
+  },
+  "hash": "int(sha256(UTF8(label))[:8],16)%10",
+  "finite_grammar_exception": "If fewer than 8 eligible labels, evaluate the complete finite grammar with shared labels; report separately.",
+  "theme_holdout": [
+    "tm_avemujica_1"
+  ],
+  "no_training_from": [
+    "frozen evaluation images",
+    "their altered versions",
+    "heldout theme sources"
+  ],
+  "source_grouping": [
+    "same parent texture/glyph atlas",
+    "same theme including dynamic forms",
+    "same capture session/video/issue"
+  ],
+  "evaluation_reuse": "Any error used for optimization turns that subset into development; create a new independent test version."
+}

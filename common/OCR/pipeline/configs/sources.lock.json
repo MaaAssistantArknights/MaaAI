@@ -1,0 +1,21 @@
+{
+  "repositories": {
+    "PaddleOCR": {
+      "url": "https://github.com/PaddlePaddle/PaddleOCR.git",
+      "commit": "b03f46425e8ff4442b268ce449e3eef758146cd4"
+    },
+    "MAA-release": {
+      "url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights.git",
+      "commit": "d94dd007aca3b519395fb1f0aee26c7bd5ba5d5f"
+    }
+  },
+  "maa_utils_commit": "6e9ba33f6ad835418097d9324c01c44a82825a2b",
+  "maadeps_version": "v2.14.1",
+  "release": {
+    "tag": "v6.20.1",
+    "published_at": "2026-10-20T15:58:03Z",
+    "asset": "MAA-v6.20.1-linux-x86_64.tar.gz",
+    "url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/releases/download/v6.20.1/MAA-v6.20.1-linux-x86_64.tar.gz",
+    "sha256": "814a128d24c8183b38003284facd56789fe8346b8a66932f9ff885df48d48bc1"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "git": {
+    "vendor/PaddleOCR": "b03f46425e8ff4442b268ce449e3eef758146cd4",
+    "vendor/MAA-release": "d94dd007aca3b519395fb1f0aee26c7bd5ba5d5f"
+  },
+  "files": {
+    "weights/PP-OCRv6_small_rec_pretrained.pdparams": "25c9bd54b0e5900916e8bb6ada938abeffb1eac1baedac0ca54a45b1c9310825",
+    "weights/korean_PP-OCRv5_mobile_rec_pretrained.pdparams": "8975dede5e0c2f47e0a7712b3d79ffdc766972f872fd0441ebcccd9d77cd52a3",
+    "releases/v6.20.1/libMaaCore.so": "1e44dbf35a9ad84a62faa90af34412f8ed038f6dcb6de6db5a8eb016902bbb85",
+    "releases/v6.20.1/libfastdeploy_ppocr.so": "ba378f22e794571e4a6df1b08b75bf1e2f3a7385763744d94916127b482c5f62",
+    "releases/v6.20.1/libonnxruntime.so.1": "58857ac312e8bbdbb7ba81ced81cec07c585b27ce3323f89f9e6a946033346de",
+    "releases/v6.20.1/libopencv_world4.so.412": "5d154fce14cb3d04e236b9196155f320ae42c6e95ed7fdd607f65c1de5a0916b"
+  },
+  "notes": [
+    "External checkout/download only; never rewrite another checkout. Native adapters must be built with the fixed release ABI.",
+    "Prepared ASCII/Korean checkpoints are initialized by token mapping, not concatenating language dictionaries."
+  ]
+}

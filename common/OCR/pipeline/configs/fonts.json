@@ -1,0 +1,32 @@
+{
+  "zh-CN": {
+    "path": "data/fonts/SourceHanSansCN-Regular.otf",
+    "sha256": "c0aa89a70f92a820ff95490fea6d472cd19621a71c9a748a4950eb2eafe6438e",
+    "family": "Source Han Sans CN"
+  },
+  "zh-TW": {
+    "path": "data/assets/word/fonts/SourceHanSansTW-Regular.otf",
+    "sha256": "3b00652fbffe1631be7afd927e4e1380d48be305595d1fb421e75215fc47f799",
+    "family": "Source Han Sans TW"
+  },
+  "en": {
+    "path": "data/fonts/SourceHanSansCN-Regular.otf",
+    "sha256": "c0aa89a70f92a820ff95490fea6d472cd19621a71c9a748a4950eb2eafe6438e",
+    "family": "Source Han Sans CN"
+  },
+  "ja": {
+    "path": "data/assets/word/fonts/SourceHanSansJP-Regular.otf",
+    "sha256": "b0a8d1b14bbea20d2b159ef87a3c6961def3dbe320c3a219c61166e4c0d015d3",
+    "family": "Source Han Sans JP"
+  },
+  "ko": {
+    "path": "data/assets/word/fonts/SourceHanSansKR-Regular.otf",
+    "sha256": "066a83ff2f4eefeeb780c2a47acec9d8518a5733a575188ac03cb9140aca78b0",
+    "family": "Source Han Sans KR"
+  },
+  "und": {
+    "path": "data/fonts/SourceHanSansCN-Regular.otf",
+    "sha256": "c0aa89a70f92a820ff95490fea6d472cd19621a71c9a748a4950eb2eafe6438e",
+    "family": "Source Han Sans CN"
+  }
+}

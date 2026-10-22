@@ -1,0 +1,29 @@
+{
+  "historical_word": {
+    "short": 0.3,
+    "long": 0.6,
+    "number": 0.1
+  },
+  "candidate_word_scenes": {
+    "recruitment": 0.1,
+    "operator_name": 0.25,
+    "item_name": 0.3,
+    "depot_quantity": 0.2,
+    "skill_replay": 0.1,
+    "symbol_replay": 0.05
+  },
+  "basis": "prioritize actual MAA word-recognition tasks; replay categories retain pretrained capability; initial engineering allocation, not measured user traffic",
+  "historical_char": {
+    "stage_code": 0.5,
+    "battle_cost": 0.3,
+    "ascii_replay": 0.2
+  },
+  "candidate_char": {
+    "stage_code": 0.25,
+    "battle_cost": 0.15,
+    "ascii_replay": 0.2,
+    "timer": 0.15,
+    "padded_number": 0.1,
+    "spaced_ascii": 0.15
+  }
+}

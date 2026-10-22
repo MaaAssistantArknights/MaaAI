@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "gpu_index": 0,
+  "maximum_existing_gpu_memory_mib": 1024,
+  "minimum_free_gpu_memory_mib": 12000,
+  "maximum_gpu_temperature_c": 85,
+  "minimum_free_runtime_disk_gib": 10,
+  "scope": "Single-device training; gpu_index is the CUDA-visible ordinal. Copy this policy to the external workspace and reference it in the train spec to change resource limits."
+}

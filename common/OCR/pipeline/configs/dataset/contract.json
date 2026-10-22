@@ -1,0 +1,89 @@
+{
+  "id": "recognition-contract-v1",
+  "input_shape": [
+    3,
+    48,
+    480
+  ],
+  "char_input_shape": [
+    3,
+    48,
+    320
+  ],
+  "encoder_max_length": 64,
+  "char_encoder_max_length": 25,
+  "ctc_time_steps": 60,
+  "languages": [
+    "zh-CN",
+    "zh-TW",
+    "en",
+    "ja",
+    "ko"
+  ],
+  "families": {
+    "recruitment": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "item_name": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "operator_name": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "skill_replay": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "depot_quantity": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "symbol_replay": {
+      "route": "WordOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 60
+    },
+    "stage_code": {
+      "route": "CharOCR",
+      "appearance_statuses": [
+        "declared_synthetic",
+        "verified_real_crop"
+      ],
+      "ctc_time_steps": 40
+    },
+    "battle_cost": {
+      "route": "CharOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 40
+    },
+    "ascii_replay": {
+      "route": "CharOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 40
+    },
+    "timer": {
+      "route": "CharOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 40
+    },
+    "padded_number": {
+      "route": "CharOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 40
+    },
+    "spaced_ascii": {
+      "route": "CharOCR",
+      "appearance_status": "declared_synthetic",
+      "ctc_time_steps": 40
+    }
+  },
+  "char_ctc_time_steps": 40
+}

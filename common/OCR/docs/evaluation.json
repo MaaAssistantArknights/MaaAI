@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "word_comparison": {
+    "date": "2026-10-03",
+    "baseline": "MAA v6.18.0 Linux x86_64",
+    "models": {
+      "old": {
+        "model_sha256": "ece6e0173b177a79358b7610524d768711c7c887895f1b2b767e2bed83ec88cf",
+        "keys_sha256": "0fa289d928d99b82bf8df12baf040d7e59fe4c092ca9faae99ce663b6a8f5661"
+      },
+      "pretrained": {
+        "model_sha256": "ecb37ec857e2da4d991a7f8b6c9f014d64322982a626c5c608e8e899f4042cae",
+        "keys_sha256": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      },
+      "finetuned": {
+        "model_sha256": "a43043964bcb5160bc7e0688b1cc8ec9861372fc774bea67495d41e50f570bed",
+        "keys_sha256": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      }
+    },
+    "detector_sha256": "d572c1773fd00e72f2f2a4c6399513223c49d70f64bc8ccf52fc6cc500b2803c",
+    "core_sha256": "c39c3cf1f0b48283ac7c96fd5fdf24df526ad27a52138603cecdac2dbaa3ed1f",
+    "input_manifest_sha256": {
+      "cases.jsonl": "b0966ca4f5cd5fc6b515897090ce1439f524a83c787bcdbe9ade86907bcbb45c",
+      "logos.jsonl": "c95fabd81b86c2f6e3e264c3d061dd82b0f63e0b5b73e053ae47e740f81f3ef0",
+      "business-cases.jsonl": "22404690e570f1ae5925524527e31d63201288c4c0c9e10407b5b91e63f80de1"
+    },
+    "counts": {
+      "operator_names": {
+        "n": 19,
+        "old": 15,
+        "pretrained": 19,
+        "finetuned": 19
+      },
+      "ALL": {
+        "n": 82,
+        "old": 62,
+        "pretrained": 82,
+        "finetuned": 81
+      },
+      "ordinary_ui": {
+        "n": 36,
+        "old": 28,
+        "pretrained": 36,
+        "finetuned": 35
+      },
+      "special_fonts": {
+        "n": 12,
+        "old": 4,
+        "pretrained": 12,
+        "finetuned": 12
+      },
+      "recruit_tags": {
+        "n": 5,
+        "old": 5,
+        "pretrained": 5,
+        "finetuned": 5
+      },
+      "shop_names": {
+        "n": 10,
+        "old": 10,
+        "pretrained": 10,
+        "finetuned": 10
+      }
+    },
+    "logo_counts": {
+      "targets": 8,
+      "old": 2,
+      "pretrained": 4,
+      "finetuned": 4
+    },
+    "business": {
+      "positive_cases": 9,
+      "positive_passes_each": 9,
+      "known_failure_cases": 1,
+      "new_business_changes": 0
+    },
+    "finetune_only_strict_difference": {
+      "id": "064",
+      "label": "今日答案!",
+      "pretrained": "今日答案!",
+      "finetuned": "今日答案！",
+      "meaning": "U+0021/U+FF01 punctuation difference; do not infer text-content degradation"
+    },
+    "public_subset": {
+      "rows": 67,
+      "correct": {
+        "old": 47,
+        "pretrained": 67,
+        "finetuned": 66
+      }
+    },
+    "public_sources": [
+      {
+        "id": "issue-18310-1",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/18310",
+        "url": "https://github.com/user-attachments/assets/2cacfba6-c29b-40b8-bcd3-cac1a5737b3b",
+        "sha256": "22cf910445804b9dd401c85fb5d5ddefecd714b9af1939ec0aa4616086e12e46",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "id": "issue-18238-1",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/18238",
+        "url": "https://github.com/user-attachments/assets/3cfb50d3-5eb8-45f7-9b51-ad4ecbdeebf1",
+        "sha256": "3f0c6fcc842467354f1cf93281a61e946836dd456843a2a60cac8409b11d258a",
+        "width": 2560,
+        "height": 1440
+      },
+      {
+        "id": "issue-10691-1",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/10691",
+        "url": "https://github.com/user-attachments/assets/7e2a23ea-b0b7-4eb0-afcc-569eb9c66fef",
+        "sha256": "5a48344708823f2908510484af9624497bb596ffe400267d63aeea39b01ac0eb",
+        "width": 179,
+        "height": 214
+      },
+      {
+        "id": "issue-17419-1",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/17419",
+        "url": "https://github.com/user-attachments/assets/614a743e-6ff3-4b1d-a381-b4bd9a71e5c4",
+        "sha256": "6270f4dc0379051f06bdeb3896ea53b72cf679670166e968ddefb473541fc7fb",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "issue-17419-2",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/17419",
+        "url": "https://github.com/user-attachments/assets/b495892a-9015-45a9-8bbd-0679b5df242a",
+        "sha256": "b27dd081fd62af6f5e77bc73e7b6aec6bd0560189a74926e36eda43df88adf98",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "issue-14789-2",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/14789",
+        "url": "https://github.com/user-attachments/assets/a695b4c9-6de7-4b5b-911d-c47f991d6af3",
+        "sha256": "0e3158455b497fc89420ae17bd7573b7da41b5252de672735cb30b4962a81037",
+        "width": 447,
+        "height": 208
+      },
+      {
+        "id": "issue-18054-000",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/18054",
+        "source_url": "https://github.com/user-attachments/files/31842189/report_09-04_23-31-27.zip",
+        "archive_sha256": "269d2bf660d4e211ef4a34e26204eb39c392ad6f499641342aa41ac80838bbeb",
+        "entry": "debug/interface/2026.09.04-23.30.52.702_raw.png",
+        "sha256": "b81eef26064330991278a871f2a756954ded138b8947980d910ca8dc26e56ce9",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "id": "issue-18054-001",
+        "issue_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/issues/18054",
+        "source_url": "https://github.com/user-attachments/files/31842189/report_09-04_23-31-27.zip",
+        "archive_sha256": "269d2bf660d4e211ef4a34e26204eb39c392ad6f499641342aa41ac80838bbeb",
+        "entry": "debug/interface/2026.09.04-23.31.25.457_raw.png",
+        "sha256": "3662cc470674e4bd60eb1e0a46f72f7886a7bbca4d55704f125060d7653f40e6",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "logos": [
+      {
+        "id": "logo-dolly",
+        "source_id": "issue-18238-1",
+        "source_sha256": "3f0c6fcc842467354f1cf93281a61e946836dd456843a2a60cac8409b11d258a",
+        "crop_xyxy": [
+          773,
+          590,
+          1405,
+          872
+        ],
+        "target_labels": [
+          [
+            "Dolly's",
+            "Dolly’s"
+          ],
+          [
+            "Playground"
+          ],
+          [
+            "逐影集趣"
+          ]
+        ],
+        "texts": {
+          "old": [
+            "0ll",
+            "",
+            "6",
+            "逐集趣"
+          ],
+          "pretrained": [
+            "Dll",
+            "YS",
+            "Playground",
+            "逐景集趣"
+          ],
+          "finetuned": [
+            "Dll",
+            "YS",
+            "Playground",
+            "逐景集趣"
+          ]
+        },
+        "matches": {
+          "old": [
+            false,
+            false,
+            false
+          ],
+          "pretrained": [
+            false,
+            true,
+            false
+          ],
+          "finetuned": [
+            false,
+            true,
+            false
+          ]
+        }
+      },
+      {
+        "id": "logo-flow",
+        "source_id": "issue-18054-000",
+        "source_sha256": "b81eef26064330991278a871f2a756954ded138b8947980d910ca8dc26e56ce9",
+        "crop_xyxy": [
+          970,
+          120,
+          1280,
+          279
+        ],
+        "target_labels": [
+          [
+            "THE FLOW"
+          ],
+          [
+            "时间之流"
+          ]
+        ],
+        "texts": {
+          "old": [
+            "时间之流",
+            "O2"
+          ],
+          "pretrained": [
+            "时间之流",
+            "THEFLOW"
+          ],
+          "finetuned": [
+            "时间之流",
+            "THEFLOW"
+          ]
+        },
+        "matches": {
+          "old": [
+            false,
+            true
+          ],
+          "pretrained": [
+            false,
+            true
+          ],
+          "finetuned": [
+            false,
+            true
+          ]
+        }
+      },
+      {
+        "id": "logo-daily",
+        "source_id": "issue-18054-001",
+        "source_sha256": "3662cc470674e4bd60eb1e0a46f72f7886a7bbca4d55704f125060d7653f40e6",
+        "crop_xyxy": [
+          10,
+          482,
+          216,
+          639
+        ],
+        "target_labels": [
+          [
+            "Daily"
+          ],
+          [
+            "Fortune"
+          ],
+          [
+            "今日答案!",
+            "今日答案！"
+          ]
+        ],
+        "texts": {
+          "old": [
+            "octy",
+            "o",
+            "今日答案!"
+          ],
+          "pretrained": [
+            "Daily",
+            "fortu",
+            "今日答案!"
+          ],
+          "finetuned": [
+            "Daily",
+            "Fortu",
+            "今日答案！"
+          ]
+        },
+        "matches": {
+          "old": [
+            false,
+            false,
+            true
+          ],
+          "pretrained": [
+            true,
+            false,
+            true
+          ],
+          "finetuned": [
+            true,
+            false,
+            true
+          ]
+        }
+      }
+    ],
+    "limitations": [
+      "Sources selected before inference; same screenshot may contribute several related rows; not random population accuracy.",
+      "Labels visually read by GPT before inference; not independently reviewed by a second human.",
+      "15 private Windows-source text crops and the full private business inputs are retained locally, not published here.",
+      "Raw scoring preserves case, spaces and punctuation; semantic exclamation equivalence is a post-hoc diagnostic only.",
+      "Chinese UI English logos are not English-client acceptance."
+    ],
+    "public_single_line_cases_file": {
+      "path": "evaluation-cases.csv",
+      "sha256": "e3b3fefe1a174634844db2ff46ce93052f2da81f97d305bbdaa804090bb6f77d",
+      "rows": 67,
+      "crop_encoding": "Pillow 12.3.0; crop XYXY original pixels; convert RGB; PNG"
+    }
+  },
+  "char_training": {
+    "trained_against_maa_release": "v6.18.0",
+    "dataset": {
+      "train_samples": 20448,
+      "dev_samples": 2000,
+      "real_replay_samples": 448,
+      "manifest_sha256": "9e238f210d728358aebcd2fe856091785b273ad66eb476f76b62a7b0d8cb35f4",
+      "source_spec_sha256": "0d1e94e0869a8f7566a45604b26e4b82606c0c816def3b26b36f749b0d937d75",
+      "MaaTestSet_commit": "dfb2238c3882a396026d9963e0b5c6fcc6c858c4",
+      "training_only": true
+    },
+    "base_training": {
+      "train_samples": 20000,
+      "dev_samples": 2000,
+      "guard_samples": 120,
+      "batch": 16,
+      "learning_rate": 5e-06,
+      "selected_step": 500,
+      "checkpoint_sha256": "f103a4c5461f853426e9144a45db640d523f5d8817dcbe788901cc8ae8f5df5f"
+    },
+    "fine_tuning": {
+      "batch": 16,
+      "learning_rate": 2e-06,
+      "planned_steps": 300,
+      "selected_step": 100,
+      "checkpoint_sha256": "16dc407e2999c5604790543634212329d7900fffc85806a7dbc218dc4ca0436c",
+      "onnx_sha256": "27547490f5232685c0e67d485168ff482a502b9d8f1b6fde4d6c0185e1f21106",
+      "plan_sha256": "69631264c3e25fd60043a8d2b3a3e635f1e6a6b33d98de79833c4a5463f74f04",
+      "spec_sha256": "3e60f993819f01972335b288bbbbfe7291bac0f9927e55423f29415539f2f384",
+      "export_equivalence": {
+        "passed": true,
+        "samples": 46,
+        "report_sha256": "715695240aaa40173cb4252872997b2f100461b343d5449e2f8e86be4f71e3de"
+      }
+    },
+    "development_results": {
+      "purpose": "checkpoint selection and development regression only; not independent accuracy",
+      "raw": {
+        "total": 239,
+        "official": 227,
+        "selected": 238
+      },
+      "rules": {
+        "total": 79,
+        "official": 79,
+        "selected": 79
+      },
+      "guard": {
+        "total": 120,
+        "selected": 120
+      }
+    }
+  },
+  "release_validation": {
+    "date": "2026-10-23",
+    "release": {
+      "tag": "v6.20.1",
+      "published_at": "2026-10-20T15:58:03Z",
+      "asset": "MAA-v6.20.1-linux-x86_64.tar.gz",
+      "url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights/releases/download/v6.20.1/MAA-v6.20.1-linux-x86_64.tar.gz",
+      "sha256": "814a128d24c8183b38003284facd56789fe8346b8a66932f9ff885df48d48bc1"
+    },
+    "source_commit": "d94dd007aca3b519395fb1f0aee26c7bd5ba5d5f",
+    "selected_routes": {
+      "zh-CN": {
+        "path": "resource/PaddleOCR/rec",
+        "inference.onnx": "ecb37ec857e2da4d991a7f8b6c9f014d64322982a626c5c608e8e899f4042cae",
+        "keys.txt": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      },
+      "zh-TW": {
+        "path": "resource/global/txwy/resource/PaddleOCR/rec",
+        "inference.onnx": "ecb37ec857e2da4d991a7f8b6c9f014d64322982a626c5c608e8e899f4042cae",
+        "keys.txt": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      },
+      "en": {
+        "path": "resource/global/YoStarEN/resource/PaddleOCR/rec",
+        "inference.onnx": "ecb37ec857e2da4d991a7f8b6c9f014d64322982a626c5c608e8e899f4042cae",
+        "keys.txt": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      },
+      "ja": {
+        "path": "resource/global/YoStarJP/resource/PaddleOCR/rec",
+        "inference.onnx": "ecb37ec857e2da4d991a7f8b6c9f014d64322982a626c5c608e8e899f4042cae",
+        "keys.txt": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
+      },
+      "ko": {
+        "path": "resource/global/YoStarKR/resource/PaddleOCR/rec",
+        "inference.onnx": "6853a1c0da58d09ac854d930c319a2601ab64741ac2a5be7618c5a93fc157f78",
+        "keys.txt": "a88071c68c01707489baa79ebe0405b7beb5cca229f4fc94cc3ef992328802d7"
+      },
+      "char": {
+        "path": "resource/PaddleCharOCR/rec",
+        "inference.onnx": "27547490f5232685c0e67d485168ff482a502b9d8f1b6fde4d6c0185e1f21106",
+        "keys.txt": "23d40abd395f6f95309602e038d7a5c7e8c5ff2fb06b48b21783cce1b983abf0"
+      }
+    },
+    "raw": {
+      "official": {
+        "correct": 62,
+        "total": 82
+      },
+      "proposed": {
+        "correct": 82,
+        "total": 82
+      }
+    },
+    "logos": {
+      "official": {
+        "correct_targets": 2,
+        "total_targets": 8
+      },
+      "proposed": {
+        "correct_targets": 4,
+        "total_targets": 8
+      }
+    },
+    "business": {
+      "official": {
+        "cases": 10,
+        "labeled_matches": 10,
+        "failures": {}
+      },
+      "proposed": {
+        "cases": 10,
+        "labeled_matches": 10,
+        "failures": {}
+      }
+    },
+    "char_development_regressions": {
+      "official": {
+        "cases": 5,
+        "labeled_matches": 5
+      },
+      "proposed": {
+        "cases": 5,
+        "labeled_matches": 5
+      }
+    },
+    "new_business_differences": [],
+    "windows_current_combination": "not_tested",
+    "foreign_client_independent_accuracy": "not_tested",
+    "performance_gate": "record_only",
+    "onnx_and_dictionary": {
+      "zh-CN": {
+        "valid": true,
+        "classes": 18710,
+        "dictionary_lines": 18708,
+        "space_plus_blank": 2
+      },
+      "zh-TW": {
+        "valid": true,
+        "classes": 18710,
+        "dictionary_lines": 18708,
+        "space_plus_blank": 2
+      },
+      "en": {
+        "valid": true,
+        "classes": 18710,
+        "dictionary_lines": 18708,
+        "space_plus_blank": 2
+      },
+      "ja": {
+        "valid": true,
+        "classes": 18710,
+        "dictionary_lines": 18708,
+        "space_plus_blank": 2
+      },
+      "ko": {
+        "valid": true,
+        "classes": 11947,
+        "dictionary_lines": 11945,
+        "space_plus_blank": 2
+      },
+      "char": {
+        "valid": true,
+        "classes": 96,
+        "dictionary_lines": 94,
+        "space_plus_blank": 2
+      }
+    },
+    "client_load_smoke": {
+      "passed_clients": [
+        "Official",
+        "txwy",
+        "YoStarEN",
+        "YoStarJP",
+        "YoStarKR"
+      ],
+      "scope": "resource registration plus one decode of same Chinese input; not corresponding-client quality acceptance"
+    },
+    "korean_weight_identity": {
+      "passed": true,
+      "tensors": 968
+    },
+    "korean_export_equivalence": {
+      "passed": true,
+      "real_input_shapes": 4,
+      "dynamic_shapes": 4,
+      "scope": "numerical/decode equivalence, not Korean quality",
+      "v6_18_and_v6_20_export_bytes_identical": true
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "path": "weights/PP-OCRv6_small_rec_pretrained.pdparams",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/PP-OCRv6_small_rec_pretrained.pdparams",
+      "sha256": "25c9bd54b0e5900916e8bb6ada938abeffb1eac1baedac0ca54a45b1c9310825"
+    },
+    {
+      "path": "weights/korean_PP-OCRv5_mobile_rec_pretrained.pdparams",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/korean_PP-OCRv5_mobile_rec_pretrained.pdparams",
+      "sha256": "8975dede5e0c2f47e0a7712b3d79ffdc766972f872fd0441ebcccd9d77cd52a3"
+    }
+  ]
+}

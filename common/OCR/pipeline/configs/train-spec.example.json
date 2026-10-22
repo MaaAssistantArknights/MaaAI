@@ -1,0 +1,20 @@
+{
+  "route": "zh-CN",
+  "dataset": "data/formal",
+  "profile": "/absolute/path/to/MaaAI/common/OCR/pipeline/configs/training.json",
+  "resource_policy": "/absolute/path/to/work/resource-policy.json",
+  "checkpoint": "models/word/initial.pdparams",
+  "model_config": "models/word/model.yml",
+  "guard_manifest": "guard.jsonl",
+  "steps": 1000,
+  "batch": 16,
+  "learning_rate": 0.000005,
+  "eval_every": 500,
+  "sampling": "balanced",
+  "purpose": "formal_training",
+  "evaluation": {
+    "manifest": "evaluation.jsonl",
+    "official": "official-predictions.json",
+    "current": "current-predictions.json"
+  }
+}

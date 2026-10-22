@@ -1,0 +1,37 @@
+{
+  "id": "ocr-refresh-v2",
+  "status": "executable_recipe",
+  "base_seed": 20260922,
+  "expansion_seed": 20260925,
+  "grammar_seed": 20260922,
+  "development_divisor": 5,
+  "pool_per_scene": {
+    "word": {
+      "recruitment": 500,
+      "item_name": 3000,
+      "operator_name": 1500,
+      "skill_replay": 2000,
+      "depot_quantity": 2000,
+      "symbol_replay": 1000
+    },
+    "char": {
+      "stage_code": 2500,
+      "battle_cost": 1500,
+      "ascii_replay": 2000,
+      "timer": 1500,
+      "padded_number": 1000,
+      "spaced_ascii": 1500
+    }
+  },
+  "sampling_policy": "configs/sampling.json",
+  "routes": {
+    "zh-CN": {"model": "v6", "sampling": "balanced", "base_train_images": 10000},
+    "zh-TW": {"model": "v6", "sampling": "historical", "base_train_images": 10000},
+    "en": {"model": "v6", "sampling": "historical", "base_train_images": 10000},
+    "ja": {"model": "v6", "sampling": "balanced", "base_train_images": 10000},
+    "ko": {"model": "v5-korean", "sampling": "balanced", "base_train_images": 10000},
+    "char": {"model": "v6-ascii", "sampling": "historical", "base_train_images": 10000, "formal_train_images": 20000}
+  },
+  "model_profile": "configs/training.json",
+  "scope": "Frozen source and training admission defaults; the train spec controls steps, learning rate and selected checkpoint. The Char rework adds reviewed real examples under its own spec."
+}

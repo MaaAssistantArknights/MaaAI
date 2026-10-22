@@ -1,0 +1,32 @@
+{
+  "version": "recognition-recipe-v4",
+  "contract": "configs/dataset/contract.json",
+  "languages": {
+    "zh-CN": {
+      "model": "v6"
+    },
+    "zh-TW": {
+      "model": "v6"
+    },
+    "en": {
+      "model": "v6"
+    },
+    "ja": {
+      "model": "v6"
+    },
+    "ko": {
+      "model": "v5-korean",
+      "dictionary": "models/ko/keys.txt"
+    }
+  },
+  "english_whole_run_fallback": {
+    "path": "data/fonts/BENDER.OTF",
+    "sha256": "b394fe0c3a3aa85784e9928b3a0288c578b438a0db7aa14fbcc686da64143444",
+    "family": "Bender",
+    "style": "Regular",
+    "appearance_status": "coverage fallback, not a verified regional UI font"
+  },
+  "char": {
+    "model": "v6-ascii"
+  }
+}

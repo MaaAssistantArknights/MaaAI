@@ -1,0 +1,188 @@
+{
+  "files": [
+    {
+      "url": "https://raw.githubusercontent.com/TimWangZi/The-font-of-Arknights/83ed0f61c0e3853cbc54cc3f5dd591505f906229/font/Novecento-Wide-Normal-2.otf",
+      "path": "data/fonts/Novecento-Wide-Normal-2.otf",
+      "sha256": "10aba19768ead3b038576d7baaf427d41b4a3b73d66f41c3ee7193ee65679156",
+      "scope": "local research; source license requires verification before redistribution",
+      "id": "Novecento-Wide-Normal-2",
+      "role": "font_candidate",
+      "redistribution": "source-specific rights; no binary assets in code PR"
+    },
+    {
+      "path": "data/fonts/SourceHanSansCN-Bold.otf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.004R/SubsetOTF/CN/SourceHanSansCN-Bold.otf",
+      "sha256": "997dd673efde3a7cc7410da3ccde2a729f26dc9e1a81ad659a2d6666d36b7974"
+    },
+    {
+      "path": "data/fonts/SourceHanSansCN-Regular.otf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.004R/SubsetOTF/CN/SourceHanSansCN-Regular.otf",
+      "sha256": "c0aa89a70f92a820ff95490fea6d472cd19621a71c9a748a4950eb2eafe6438e"
+    },
+    {
+      "id": "font-tw",
+      "path": "data/assets/word/fonts/SourceHanSansTW-Regular.otf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.004R/SubsetOTF/TW/SourceHanSansTW-Regular.otf",
+      "role": "word_font",
+      "locale": "tw",
+      "tag": "2.004R",
+      "sha256": "3b00652fbffe1631be7afd927e4e1380d48be305595d1fb421e75215fc47f799",
+      "bytes": 5683684
+    },
+    {
+      "id": "font-jp",
+      "path": "data/assets/word/fonts/SourceHanSansJP-Regular.otf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.004R/SubsetOTF/JP/SourceHanSansJP-Regular.otf",
+      "role": "word_font",
+      "locale": "jp",
+      "tag": "2.004R",
+      "sha256": "b0a8d1b14bbea20d2b159ef87a3c6961def3dbe320c3a219c61166e4c0d015d3",
+      "bytes": 4533336
+    },
+    {
+      "id": "font-kr",
+      "path": "data/assets/word/fonts/SourceHanSansKR-Regular.otf",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.004R/SubsetOTF/KR/SourceHanSansKR-Regular.otf",
+      "role": "word_font",
+      "locale": "kr",
+      "tag": "2.004R",
+      "sha256": "066a83ff2f4eefeeb780c2a47acec9d8518a5733a575188ac03cb9140aca78b0",
+      "bytes": 4645048
+    },
+    {
+      "url": "https://raw.githubusercontent.com/TimWangZi/The-font-of-Arknights/83ed0f61c0e3853cbc54cc3f5dd591505f906229/font/Bender/BENDER.OTF",
+      "path": "data/fonts/BENDER.OTF",
+      "sha256": "b394fe0c3a3aa85784e9928b3a0288c578b438a0db7aa14fbcc686da64143444",
+      "scope": "local research; do not redistribute font binary without license verification",
+      "id": "BENDER",
+      "role": "font_candidate",
+      "redistribution": "source-specific rights; no binary assets in code PR"
+    },
+    {
+      "path": "data/backgrounds/items/2001.png",
+      "sha256": "f1c8b7f71f46a0661c999e55524be5bd12ce5b54b1e9ce6a57a171a1b49d24b4",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/2001.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/2002.png",
+      "sha256": "51d9d01e1ed9b43cb9d69e8fc4b9a7fffdca030277fca3cd53000efb5f0ba4e0",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/2002.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/2003.png",
+      "sha256": "123630460c106d4764cabbad31cc640ac48cdaf2cbdee504960ac81f77f326d2",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/2003.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/2004.png",
+      "sha256": "ac682a2a4eb6ec6144c95bf0bdbd851fa9091fb25c4306dd3759674d51033291",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/2004.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/30115.png",
+      "sha256": "f29186e1f540cfae580f5b8f80181e30a27aabd5aefed0fd55bb16ae7297df65",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/30115.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/30125.png",
+      "sha256": "0d2fa30be9165dd52f1bed2e651608e1a7972e1dfd7c035436612e8f844a0f0a",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/30125.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/30145.png",
+      "sha256": "208e1d87c02deecd4e4be1788c243edf47fcf40ecdeff1ea92c5a60a36f67a5d",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/30145.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/30155.png",
+      "sha256": "3a88e2155c818bba8ba2c260abefd84b4f9937738862f4ffaf6b650650cf00bb",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/30155.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31053.png",
+      "sha256": "bed8c1fa629e970dcec3b55a8de70919e7d7b377dd3fb970e0642a126a131a0a",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31053.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31054.png",
+      "sha256": "b2b309eec692f026530203cd460d8878378acd6f60d48cd1424ec689c50d016a",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31054.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31063.png",
+      "sha256": "9995719dac54a6335725c6a2ce24ae142a81c77ab608673194443ddad4f9378d",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31063.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31064.png",
+      "sha256": "948ebc56f277da312b4e0f3502dc1619c68d7d3c9c43f69c07c303ee9785fed0",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31064.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31073.png",
+      "sha256": "ef16365add70669b615d3fa1f9a4a2f92eed7ba720fd2c6607a1a3223f709b93",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31073.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31083.png",
+      "sha256": "0eac6f9b14ec3a6138d946b3bf2366a12221f1bde7974ab32bf39d45a8a13a59",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31083.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/31084.png",
+      "sha256": "e6c1a7d48db2c8c8727d71c48e41240e407690de77f4f5302b1f8ac2e2fc32af",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/31084.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/3301.png",
+      "sha256": "1631322f98f8aba7561b7a0d2bee071fa0ddd824a0312cacdf2aadd5e21b8094",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/3301.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/3302.png",
+      "sha256": "98790ccdbce3fb90a0cb5823c85f1578b9a74cf6e173827f96a4182fbf12d3c6",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/3302.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/3303.png",
+      "sha256": "8d1f00532d6eb30b816e729bbfbfad78cdbfb2e6539825a1a6f2ac59e163dacf",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/3303.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/mod_unlock_token.png",
+      "sha256": "d3b65114ecc52dd7cb1a6c93f1b463ff511c7f9f6aeb23b1e91d10494de00c8c",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/mod_unlock_token.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/mod_update_token_1.png",
+      "sha256": "68245242ad126901f772aa24c8998fc67d9dfa83ccd2de65e61b22a096294eb7",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/mod_update_token_1.png",
+      "role": "item_background"
+    },
+    {
+      "path": "data/backgrounds/items/mod_update_token_2.png",
+      "sha256": "136d6f04f7cee60dd72c75a4451ea77244d24a281dc791ad9963bd90e4f6ca1f",
+      "url": "https://raw.githubusercontent.com/MaaAssistantArknights/MaaAssistantArknights/23feeddc538de4e10646b692b0bb065efe77ccb3/resource/template/items/mod_update_token_2.png",
+      "role": "item_background"
+    }
+  ]
+}

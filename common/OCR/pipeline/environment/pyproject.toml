@@ -1,0 +1,26 @@
+[project]
+name = "maaai-ocr-refresh"
+version = "0.1.0"
+description = "Reproducible v5/v6 OCR training and MAA interface validation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "paddlepaddle-gpu==3.4.0",
+  "cuda-bindings==12.9.8",
+  "numpy", "pillow", "fonttools", "opencv-python-headless",
+  "shapely", "scikit-image", "pyclipper", "lmdb", "tqdm", "rapidfuzz",
+  "cython", "pyyaml", "requests", "albumentations", "albucore", "packaging",
+  "easydict", "tenacity", "matplotlib", "scipy", "six", "termcolor",
+  "paddle2onnx==2.1.0", "onnx", "onnxruntime", "onnxoptimizer",
+  "pytest", "cmake>=3.28", "ninja", "setuptools", "psutil",
+]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "paddle-cu129"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu129/"
+explicit = true
+
+[tool.uv.sources]
+paddlepaddle-gpu = { index = "paddle-cu129" }

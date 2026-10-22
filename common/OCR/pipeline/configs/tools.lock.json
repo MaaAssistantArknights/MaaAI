@@ -1,0 +1,7 @@
+{
+  "micromamba": {
+    "version": "2.9.0",
+    "url": "https://micro.mamba.pm/api/micromamba/linux-64/2.9.0",
+    "binary_sha256": "366cd9cd8be14df1ab8ed50352a82111082a36686b2d389fdb79a92c3fafb3e3"
+  }
+}
